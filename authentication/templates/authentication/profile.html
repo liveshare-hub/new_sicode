@@ -107,14 +107,51 @@ Update Profile
                 {% endfor %}
                 </div>
               </div>
-
               
-
-
-
+            </div>
+            
+          </div>
+          <div class="card mt-2">
+            <h5 class="card-header">KPJ TK</h5>
+            <div class="card-body">
+              <div class="table-reponsive-md">
+                <table class="table table-bordered">
+                  <thead>
+                    <tr>
+                      <th scope="col" >No</th>
+                      <th scope="col" class="text-center">No KPJ</th>
+                      <th scope="col" class="text-center">BLTH Keps</th>
+                      <th scope="col" class="text-center">BLTH NA</th>
+                      <th scope="col" class="text-center">STATUS AKTIF</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                  {% for data in datas_na %}
+                    <tr>
+                      <td>{{forloop.counter}}</td>
+                      <td class="text-center">
+                      {{data.no_kpj}}
+                      </td>
+                      <td class="text-center">
+                      {{data.blth_keps}}
+                      </td>
+                      <td class="text-center">
+                      {{data.blth_na}}
+                      </td>
+                      <td class="text-center">
+                      {% if data.is_aktif %}
+                        Ya
+                      {% else %}
+                        Tidak
+                      {% endif %}
+                      </td>
+                    </tr>
+                  {% endfor %}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
-
         
             </div>
         </div>

@@ -12,7 +12,7 @@ from django.http import HttpResponse
 from django.contrib.auth.hashers import make_password
 from .forms import LoginForm, SignUpForm, ProfileForm
 
-from klaim_registration.form import DataTK
+from klaim_registration.form import DataTK, NoKPJ
 from .models import Profile
 
 
@@ -79,8 +79,11 @@ def DetilProfile(request):
 
 def DetilProfileTK(request, pk):
     qs = Profile.objects.select_related('user').filter(pk=pk)
+    datas_na = NoKPJ.objects.select_related('user_kpj').filter(
+            user_kpj__npp_id=request.user.profile.npp_id, is_aktif=False, pk=pk)
     context = {
-        'datas': qs
+        'datas': qs,
+        'datas_na':datas_na
     }
     return render(request, 'authentication/profile.html', context)
 
