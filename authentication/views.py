@@ -80,12 +80,12 @@ def DetilProfile(request):
 def DetilProfileTK(request, pk):
     qs = Profile.objects.select_related('user').filter(pk=pk)
     datas_na = NoKPJ.objects.select_related('user_kpj').filter(
-            user_kpj__npp_id=request.user.profile.npp_id, is_aktif=False, pk=pk)
+        user_kpj__npp_id=request.user.profile.npp_id, user_kpj_id=pk)
     context = {
         'datas': qs,
-        'datas_na':datas_na
+        'datas_na': datas_na
     }
-    return render(request, 'authentication/profile.html', context)
+    return render(request, 'authentication/profile_tk.html', context)
 
 
 def settingProfile(request, pk):

@@ -64,17 +64,11 @@ class NoKPJ(models.Model):
 class DataTK(models.Model):
     kpj = models.ForeignKey(
         NoKPJ, on_delete=models.CASCADE)
-    npp = models.ForeignKey(Perusahaan, on_delete=models.CASCADE)
     nik = models.CharField(max_length=16, validators=[
                            NIK_VALIDATOR])
-    tempat_lahir = models.CharField(max_length=100)
-    tgl_lahir = models.DateField()
     # no_kpj = models.ForeignKey(NoKPJ, on_delete=models.CASCADE)
     alamat = models.CharField(max_length=250)
     nama_ibu = models.CharField(max_length=100)
-    no_hp = models.CharField(max_length=13, validators=[
-                             HP_VALIDATOR])
-    propic = models.ImageField(upload_to='profile/tk/', blank=True, null=True)
     status = models.CharField(choices=STATUS, max_length=1, default='1')
     nama_pasangan = models.CharField(max_length=100, null=True, blank=True)
     tgl_lahir_pasangan = models.DateField(blank=True, null=True)
@@ -89,7 +83,7 @@ class DataTK(models.Model):
 
     def __str__(self):
 
-        return '{} - {}'.format(self.no_kpj.no_kpj, self.nama)
+        return '{} - {}'.format(self.kpj.no_kpj, self.kpj.profile.nama)
 
 
 class DataKlaim(models.Model):

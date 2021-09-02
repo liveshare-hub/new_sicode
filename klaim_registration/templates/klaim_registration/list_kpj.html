@@ -31,7 +31,7 @@
   
   <table id="example" class="table table-responsive table-bordered table-striped">
       <thead>
-          <tr>
+          <tr class="text-center">
           <th scope="col">#</th>
           <th scope="col">Nama</th>
           <th scope="col">KPJ</th>
@@ -43,7 +43,7 @@
     </thead>
     <tbody>
     {% for data in datas  %}
-      <tr>
+      <tr class="text-center">
           <td>{{forloop.counter}}</td>
           <td><a href="{% url 'profile-tk' data.user_kpj.id%}">{{data.user_kpj.nama}}</a></td>
           <td>{{data.no_kpj}}</td>
@@ -62,7 +62,7 @@
           {% else %}
           <td>T</td>
           {% endif %}
-          <td><a href="{% url 'update_profile' data.user_kpj.id%}" class="btn btn-sm btn-warning mx-2">edit</a><a href="{% url 'add-kpj' data.user_kpj.id%}" class="btn btn-sm btn-success">add kpj</td>
+          <td><a href="{% url 'update_profile' data.user_kpj.id%}" class="btn btn-sm btn-warning mx-2">edit profile</a><a href="{% url 'add-kpj' data.user_kpj.id%}" class="btn btn-sm btn-success">add kpj</td>
       </tr>
       
     {% endfor %}

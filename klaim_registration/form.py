@@ -74,18 +74,10 @@ class DataTKForm(forms.ModelForm):
     class Meta:
         model = DataTK
         fields = '__all__'
-        exclude = ('npp',)
         widgets = {
             'nik': forms.TextInput(attrs={
                 'class': 'form-control', 'placeholder': 'No KTP'
             }),
-            'tgl_lahir': forms.DateInput(attrs={
-                'class': 'form-control', 'type': 'date'
-            }),
-            'tempat_lahir': forms.TextInput(attrs={
-                'class': 'form-control', 'placeholder': 'Tempat Lahir'
-            }),
-
             'alamat': forms.TextInput(attrs={
                 'class': 'form-control', 'placeholder': 'Alamat'
             }),
@@ -109,12 +101,6 @@ class DataTKForm(forms.ModelForm):
             }),
             'tgl_lahir_d': forms.DateInput(attrs={
                 'class': 'form-control'
-            }),
-            'propic': forms.FileInput(attrs={
-                'class': 'form-control'
-            }),
-            'no_hp': forms.TextInput(attrs={
-                'class': 'form-control', 'placeholder': 'Insert NO HP'
             }),
             'status': forms.Select(attrs={
                 'class': 'form-control'

@@ -43,7 +43,7 @@ def index(request):
         qs = Profile.objects.select_related('npp').get(
             user__username=user, is_hrd=True)
         datas = DataKlaim.objects.select_related(
-            'data_tk').filter(data_tk__npp_id=qs.npp_id)
+            'data_tk').filter(data_tk__kpj__user_kpj__npp_id=qs.npp_id)
         size = datas.count()
 
     else:
