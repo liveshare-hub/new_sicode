@@ -1,13 +1,15 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import RegexValidator
+from django.db.models.signals import post_save, pre_save
+from django.dispatch import receiver
 from PIL import Image, ImageDraw
 import uuid
 import qrcode
 from io import BytesIO
 from django.core.files import File
 
-from authentication.models import Profile
+from authentication.models import Profile, Perusahaan, ProfileTK
 # from .uuid_gen import autoGen
 
 NIK_VALIDATOR = RegexValidator("^\d{16}$",
@@ -38,31 +40,41 @@ STATUS_APPROVAL = (
     ('DITOLAK', 'DITOLAK')
 )
 
+AKTIF_NA = (
+    (False, 'Tidak Aktif'),
+    (True, 'Aktif')
+)
 
-class Perusahaan(models.Model):
-    nama = models.CharField(max_length=200)
-    npp = models.CharField(max_length=8)
+
+class NoKPJ(models.Model):
+    user_kpj = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    no_kpj = models.CharField(max_length=15)
+    blth_keps = models.DateField()
+    blth_na = models.DateField(blank=True, null=True)
+    is_aktif = models.BooleanField(choices=AKTIF_NA, default=False)
 
     class Meta:
-        ordering = ['-npp']
-        verbose_name = "NPP"
-        verbose_name_plural = "LIST NPP"
+        verbose_name = "KPJ"
+        verbose_name_plural = "LIST KPJ"
 
     def __str__(self):
-        return self.nama
+        return '{} - {}'.format(self.no_kpj, self.user_kpj.nama)
 
 
-class DataKlaim(models.Model):
-    # user = models.ForeignKey(User, on_delete=models.CASCADE)
-    profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
-    nama = models.CharField(max_length=200)
-    nik = models.CharField(max_length=16, validators=[NIK_VALIDATOR])
-    kpj = models.CharField(max_length=11)
+class DataTK(models.Model):
+    kpj = models.ForeignKey(
+        NoKPJ, on_delete=models.CASCADE)
     npp = models.ForeignKey(Perusahaan, on_delete=models.CASCADE)
+    nik = models.CharField(max_length=16, validators=[
+                           NIK_VALIDATOR])
+    tempat_lahir = models.CharField(max_length=100)
     tgl_lahir = models.DateField()
-    tempat_lahir = models.CharField(max_length=200)
+    # no_kpj = models.ForeignKey(NoKPJ, on_delete=models.CASCADE)
     alamat = models.CharField(max_length=250)
     nama_ibu = models.CharField(max_length=100)
+    no_hp = models.CharField(max_length=13, validators=[
+                             HP_VALIDATOR])
+    propic = models.ImageField(upload_to='profile/tk/', blank=True, null=True)
     status = models.CharField(choices=STATUS, max_length=1, default='1')
     nama_pasangan = models.CharField(max_length=100, null=True, blank=True)
     tgl_lahir_pasangan = models.DateField(blank=True, null=True)
@@ -70,8 +82,21 @@ class DataKlaim(models.Model):
     tgl_lahir_s = models.DateField(null=True, blank=True)
     nama_anak_d = models.CharField(max_length=100, blank=True, null=True)
     tgl_lahir_d = models.DateField(null=True, blank=True)
-    no_hp = models.CharField(max_length=15, validators=[HP_VALIDATOR])
-    email = models.EmailField(max_length=200, null=True, blank=True)
+
+    class Meta:
+        verbose_name = "DATA TK"
+        verbose_name_plural = "LIST DATA TK"
+
+    def __str__(self):
+
+        return '{} - {}'.format(self.no_kpj.no_kpj, self.nama)
+
+
+class DataKlaim(models.Model):
+    # user = models.ForeignKey(User, on_delete=models.CASCADE)
+    data_tk = models.ForeignKey(DataTK, on_delete=models.CASCADE)
+    # tgl_na = models.DateField()
+    email = models.EmailField(max_length=100)
     nama_rekening = models.CharField(max_length=100)
     no_rekening = models.CharField(
         max_length=16, validators=[NO_REK_VALIDATOR])
@@ -79,8 +104,8 @@ class DataKlaim(models.Model):
         upload_to='kk/', validators=[EKSTENSI_VALIDATOR])
     file_ktp = models.FileField(
         upload_to='ktp/', validators=[EKSTENSI_VALIDATOR])
-    file_buku_nikah = models.FileField(
-        upload_to='buku-nikah/', validators=[EKSTENSI_VALIDATOR])
+    file_paklaring = models.FileField(
+        upload_to='vaklaring/', validators=[EKSTENSI_VALIDATOR])
     file_lain = models.FileField(
         upload_to='lain/', null=True, blank=True, validators=[EKSTENSI_VALIDATOR])
     created_on = models.DateField(auto_now_add=True)
@@ -90,26 +115,26 @@ class DataKlaim(models.Model):
         verbose_name_plural = "LIST DATA KLAIM"
 
     def __str__(self):
-        return '{} - {}'.format(self.nik, self.nama)
+        return self.data_tk.profile.no_kpj
 
 
-class DaftarHRD(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    nama = models.CharField(max_length=100)
-    npp = models.ForeignKey(Perusahaan, on_delete=models.CASCADE)
+# class DaftarHRD(models.Model):
+#     user = models.ForeignKey(User, on_delete=models.CASCADE)
+#     nama = models.CharField(max_length=100)
+#     npp = models.ForeignKey(Perusahaan, on_delete=models.CASCADE)
 
-    class Meta:
-        verbose_name_plural = "LIST HRD"
+#     class Meta:
+#         verbose_name_plural = "LIST HRD"
 
-    def __str__(self):
-        return self.nama
+#     def __str__(self):
+#         return self.nama
 
 
 class ApprovalHRD(models.Model):
     status = models.CharField(choices=STATUS_APPROVAL,
                               default='DALAM PEMERIKSAAN', max_length=20)
     klaim = models.ForeignKey(DataKlaim, on_delete=models.CASCADE)
-    hrd = models.ForeignKey(DaftarHRD, on_delete=models.CASCADE)
+    hrd = models.ForeignKey(Profile, on_delete=models.CASCADE)
     keterangan = models.TextField(null=True, blank=True)
 
 
@@ -147,3 +172,13 @@ class toQRCode(models.Model):
         canvas.close()
         # qrcode_image.close()
         super().save(*args, **kwargs)
+
+
+# @receiver(post_save, sender=Profile)
+# def create_datatk(sender, instance, created, **kwargs):
+#     if created:
+        # datatk = DataTK()
+        # datatk.save()
+        # instance.profile = datatk
+        # instance.save()
+        # DataTK.objects.create(profile=instance)

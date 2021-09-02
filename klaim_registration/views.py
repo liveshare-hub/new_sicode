@@ -11,9 +11,11 @@ import random
 import string
 
 from django.core import serializers
+from django.forms import inlineformset_factory
 
-from .form import DataKlaimForm
-from .models import DataKlaim, Perusahaan, ApprovalHRD, DaftarHRD, toQRCode
+from .form import DataKlaimForm, DataTKForm, KPJForm
+from .models import DataKlaim, ApprovalHRD, toQRCode, DataTK, NoKPJ
+from authentication.models import Perusahaan, Profile
 from .decorators import admin_only
 
 from django.core.mail import EmailMessage, EmailMultiAlternatives
@@ -30,20 +32,24 @@ from email import encoders
 @login_required(login_url='/accounts/login/')
 def index(request):
     user = request.user
+    # is_admin = User.objects.filter(username=user, is_superuser=True).exists()
 
-    is_admin = User.objects.filter(username=user, is_superuser=True)
-
-    is_hrd = DaftarHRD.objects.select_related(
-        'user').filter(user__username=user)
-    if is_admin:
-        datas = DataKlaim.objects.all()
+    # is_hrd = Profile.objects.select_related(
+    #     'user').filter(user__username=user, is_hrd=True)
+    if user.is_superuser:
+        datas = DataKlaim.objects.select_related('data_tk').all()
         size = datas.count()
-    elif is_hrd:
-        # return redirect('hrd-klaim')
-        return redirect('get-detail')
+    elif user.profile.is_hrd:
+        qs = Profile.objects.select_related('npp').get(
+            user__username=user, is_hrd=True)
+        datas = DataKlaim.objects.select_related(
+            'data_tk').filter(data_tk__npp_id=qs.npp_id)
+        size = datas.count()
+
     else:
-        datas = DataKlaim.objects.filter(profile__user=user).annotate(status_approve=Subquery(
+        datas = DataKlaim.objects.select_related('data_tk').filter(user=user).annotate(status_approve=Subquery(
             ApprovalHRD.objects.filter(klaim_id=OuterRef('pk')).values('status')[:1]))
+        # datas = DataKlaim.objects.
         size = datas.count()
     context = {
         'datas': datas,
@@ -53,10 +59,76 @@ def index(request):
     return render(request, 'klaim_registration/index.html', context)
 
 
+def listKPJ(request):
+    if request.user.profile.is_hrd:
+        datas_aktif = NoKPJ.objects.select_related(
+            'user_kpj').filter(user_kpj__npp_id=request.user.profile.npp_id, is_aktif=True)
+        datas_na = NoKPJ.objects.select_related('user_kpj').filter(
+            user_kpj__npp_id=request.user.profile.npp_id, is_aktif=False)
+    context = {
+        'datas': datas_aktif,
+        'datas_na': datas_na
+    }
+    return render(request, 'klaim_registration/list_kpj.html', context)
+
+
+@login_required(login_url='/accounts/login/')
+@admin_only
+def daftarKPJ(request):
+    if request.method == 'POST':
+        form = KPJForm(request.POST)
+        if form.is_valid():
+            post = form.save(commit=False)
+            nama = request.POST.get('nama')
+            x = list(nama)
+            m = (x[0]+x[1]).upper()
+            str_digits = string.digits
+            username = m+(''.join(random.choice(str_digits)for i in range(6)))
+            password = make_password('WELCOME1', salt=[username])
+            cek = User.objects.filter(username=username)
+            if cek.exists():
+                messages.WARNING(request, "User Sudah Terpakai")
+            else:
+                buat_user = User.objects.create(
+                    username=username, password=password)
+                post.user_kpj_id = buat_user.id
+            # post.user_kpj.user_id = buat_user.id
+            post.user_kpj.npp_id = request.user.profile.npp_id
+            # print(post.user_kpj.npp_id)
+            post.user_kpj.nama = nama
+            post.user_kpj.is_hrd = False
+            post.save()
+            post.user_kpj.save()
+
+            return redirect(reverse('list-kpj'))
+    else:
+        form = KPJForm()
+    return render(request, 'klaim_registration/daftar_kpj.html', {'form': form})
+
+
+@login_required(login_url='/accounts/login/')
+@admin_only
+def tambahKPJ(request, pk):
+    user = Profile.objects.get(pk=pk)
+    # npp = user.npp
+    # print(user)
+    KpjInlineFormset = inlineformset_factory(
+        Profile, NoKPJ, fields=('no_kpj', 'blth_keps', 'blth_na', 'is_aktif',), extra=1)
+    # formset = KpjInlineFormset(queryset=Profile.objects.none(), instance=user)
+    if request.method == 'POST':
+        formset = KpjInlineFormset(request.POST, instance=user)
+        if formset.is_valid():
+            formset.save()
+            return redirect(reverse('list-kpj'))
+    else:
+        formset = KpjInlineFormset(instance=user)
+    return render(request, 'klaim_registration/input_kpj.html', {'forms': formset})
+
+
 @login_required(login_url='/accounts/login/')
 @admin_only
 def tambahKlaim(request):
-    # user = request.user
+    user = request.user
     # cekKlaim = ApprovalHRD.objects.select_related('klaim__user').filter(
     #     klaim__user__username=user, status='DISETUJUI')
     # if cekKlaim.exists():
@@ -76,7 +148,7 @@ def tambahKlaim(request):
             ApprovalHRD.objects.create(klaim_id=post.id, hrd_id=post.npp_id)
             toQRCode.objects.create(tk_klaim_id=post.id)
 
-            return redirect('home-klaim')
+            return redirect('home')
 
     else:
         forms = DataKlaimForm()
@@ -85,6 +157,61 @@ def tambahKlaim(request):
 
 @login_required(login_url='/accounts/login/')
 @admin_only
+def TambahTK(request):
+    user = Profile.objects.get(user=request.user)
+    npp = user.npp_id
+    # data = NoKPJ.objects.all()
+    if request.method == 'POST':
+        form = DataTKForm(request.POST, request.FILES)
+
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.nik = form.cleaned_data['nik']
+            post.tgl_lahir = form.cleaned_data['tgl_lahir']
+            post.alamat = form.cleaned_data['alamat']
+            post.nama_ibu = form.cleaned_data['nama_ibu']
+            post.status = form.cleaned_data['status']
+            post.npp_id = npp
+            post.nama_pasangan = form.cleaned_data['nama_pasangan']
+            post.tgl_lahir_pasangan = form.cleaned_data['tgl_lahir_pasangan']
+            post.nama_anak_s = form.cleaned_data['nama_anak_s']
+            post.tgl_lahir_s = form.cleaned_data['tgl_lahir_s']
+            post.nama_anak_d = form.cleaned_data['nama_anak_d']
+            post.tgl_lahir_d = form.cleaned_data['tgl_lahir_d']
+            # post.tgl_aktif = form.cleaned_data['tgl_aktif']
+            # nama = request.POST.get('nama')
+            # x = list(nama)
+            # m = (x[0]+x[1]).upper()
+            # str_digits = string.digits
+            # username = m+(''.join(random.choice(str_digits)for i in range(6)))
+            # password = make_password('WELCOME1', salt=[username])
+            # cek = User.objects.filter(username=username)
+            # if cek.exists():
+            #     messages.WARNING(request, "User Sudah Terpakai")
+            # else:
+            #     buat_user = User.objects.create(
+            #         username=username, password=password)
+            #     post.user_id = buat_user.id
+            post.save()
+            return redirect(reverse(('home')))
+    else:
+        form = DataTKForm()
+        form2 = KPJForm()
+    return render(request, 'klaim_registration/daftar_tk.html', {'form': form, 'kpj': form2})
+
+
+@ login_required(login_url='/accounts/login/')
+@ admin_only
+def DaftarTk(request):
+    datas = DataTK.objects.all()
+    context = {
+        'datas': datas
+    }
+    return render(request, 'klaim_registration/list_tk.html', context)
+
+
+@ login_required(login_url='/accounts/login/')
+@ admin_only
 def tambahKlaim1(request):
     if request.method == 'POST':
         forms = DataKlaimForm(request.POST, request.FILES)
@@ -121,7 +248,7 @@ def tambahKlaim1(request):
     return render(request, 'klaim_registration/daftar.html', {'forms': forms})
 
 
-@login_required(login_url='/accounts/login/')
+@ login_required(login_url='/accounts/login/')
 def daftarKlaimHRD(request):
     # print(request.user)
     datas = ApprovalHRD.objects.select_related('hrd').filter(
@@ -175,7 +302,7 @@ def daftarKlaimHRD1(request):
 #     return render(request, 'klaim_registration/modal.html', context)
 
 @ login_required(login_url='/accounts/login/')
-@admin_only
+@ admin_only
 def get_klaimhrd_json(request, klaim_id):
     hrd_qs = list(toQRCode.objects.select_related('tk_klaim').filter(tk_klaim__hrd__user__username=request.user, tk_klaim__klaim_id=klaim_id).values(
         'tk_klaim_id', 'tk_klaim__klaim__nama', 'tk_klaim__klaim__nik', 'tk_klaim__klaim__kpj', 'tk_klaim__klaim__npp', 'tk_klaim__klaim__tempat_lahir', 'tk_klaim__klaim__tgl_lahir',
@@ -183,6 +310,16 @@ def get_klaimhrd_json(request, klaim_id):
     ))
 
     return JsonResponse({'data': hrd_qs})
+
+
+@ login_required(login_url='/accounts/login/')
+@ admin_only
+def DataTKJson(request):
+    npp = request.user.profile.npp
+    tk_json = list(NoKPJ.objects.select_related('npp').filter(
+        npp=npp).values('npp__nama', 'no_kpj', 'is_aktif'))
+
+    return JsonResponse({'data': tk_json})
 
 
 def get_detail_tk(request):
@@ -205,7 +342,7 @@ def get_detail_tk(request):
     return render(request, 'klaim_registration/hrd.html', context)
 
 
-@login_required(login_url='/accounts/login/')
+@ login_required(login_url='/accounts/login/')
 def daftarSeluruhKlaim(request):
     is_hrd = ApprovalHRD.objects.all().filter(
         hrd__user__username=request.user)[0]
@@ -214,7 +351,7 @@ def daftarSeluruhKlaim(request):
         datas = is_hrd.all()
         return render(request, 'klaim_registration/hrd.html', {'datas': datas})
     else:
-        return redirect('home-klaim')
+        return redirect('home')
 
 
 def qrcode_display(request, id):
@@ -225,7 +362,7 @@ def qrcode_display(request, id):
     return JsonResponse({'data': qr_qs})
 
 
-@login_required(login_url='/accounts/login/')
+@ login_required(login_url='/accounts/login/')
 def detail_tk(request, uid):
     datas = toQRCode.objects.select_related('tk_klaim').filter(
         url_uuid=uid)

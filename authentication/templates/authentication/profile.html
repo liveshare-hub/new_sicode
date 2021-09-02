@@ -1,0 +1,122 @@
+{% extends 'layouts/base.html' %}
+
+{% load static %}
+
+{% block title %}
+Update Profile
+{% endblock  %}
+
+{% block stylesheets %}{% endblock  %}
+
+{% block content %}
+    <main class="c-main">
+        <div class="container-fluid">
+            <div class="fade-in">
+                <div class="row gutters-sm">
+            <div class="col-md-4 mb-3">
+              <div class="card">
+                <div class="card-body">
+                  <div class="d-flex flex-column align-items-center text-center">
+                    {% if datas.0.propic %}
+                        <img src="{{datas.0.propic.url}}" alt="Admin" class="rounded-circle" width="150">
+                    {% else %}
+                        <img src="/media/profile/profile_none.png" alt="Admin" class="rounded-circle" width="150">
+                    {% endif %}
+                    <div class="mt-3">
+                      <h4>{{datas.0.user}}</h4>
+                      <p class="text-secondary mb-1">
+                      {% if datas.0.is_hrd %}
+                        HRD
+                      {% else %}
+                        TK
+                      {% endif %}
+                      </p>
+                      <p class="text-muted font-size-sm">{{datas.0.npp}}</p>
+                      
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="card mt-3">
+                
+              </div>
+            </div>
+            <div class="col-md-8">
+              <div class="card mb-3">
+                <div class="card-body">
+                    {% for data in datas %}
+                  <div class="row">
+                    <div class="col-sm-3">
+                      <h6 class="mb-0">Full Name</h6>
+                    </div>
+                    <div class="col-sm-9 text-secondary">
+                      {{data.nama}}
+                    </div>
+                  </div>
+                  <hr>
+                  <div class="row">
+                    <div class="col-sm-3">
+                      <h6 class="mb-0">NPP</h6>
+                    </div>
+                    <div class="col-sm-9 text-secondary">
+                      {{data.npp}}
+                    </div>
+                  </div>
+                  <hr>
+                  <div class="row">
+                    <div class="col-sm-3">
+                      <h6 class="mb-0">Tgl. Lahir</h6>
+                    </div>
+                    <div class="col-sm-9 text-secondary">
+                      {{data.tgl_lahir}}
+                    </div>
+                  </div>
+                  <hr>
+                  <div class="row">
+                    <div class="col-sm-3">
+                      <h6 class="mb-0">Tempat Lahir</h6>
+                    </div>
+                    <div class="col-sm-9 text-secondary">
+                      {{data.tempat_lahir}}
+                    </div>
+                  </div>
+                  <hr>
+                  <div class="row">
+                    <div class="col-sm-3">
+                      <h6 class="mb-0">No.HP/Whatsapp</h6>
+                    </div>
+                    <div class="col-sm-9 text-secondary">
+                      {{data.no_hp}}
+                    </div>
+                  </div>
+                  <hr>
+                  <div class="row">
+                    <div class="col-sm-3">
+                      <h6 class="mb-0">Jabatan</h6>
+                    </div>
+                    <div class="col-sm-9 text-secondary">
+                        {% if data.is_hrd %}
+                        HRD
+                        {% else %}
+                        TK
+                        {% endif %}
+                    </div>
+                  </div>
+                  <hr>
+                  
+                {% endfor %}
+                </div>
+              </div>
+
+              
+
+
+
+            </div>
+          </div>
+
+        
+            </div>
+        </div>
+    </main>
+{% endblock  %}

@@ -10,9 +10,13 @@ def ProPic(request):
         return {'propic': propic}
 
     elif request.user.is_authenticated:
-        propic = Profile.objects.get(
+        propic = Profile.objects.filter(
             user__username=request.user)
-        return {'propic': propic}
+        if not propic.exists():
+            propic = None
+        else:
+            propic = propic.first()
+            return {'propic': propic}
     else:
         propic = None
         return {'propic': propic}

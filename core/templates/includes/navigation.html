@@ -32,7 +32,12 @@
                 <use xlink:href="/static/assets/vendors/@coreui/icons/svg/free.svg#cil-envelope-open"></use>
               </svg></a></li>
           <li class="c-header-nav-item dropdown"><a class="c-header-nav-link" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
-              <div class="c-avatar"><img class="c-avatar-img" src="/static/assets/img/avatars/6.jpg" alt="user@email.com"></div>
+          {% if not request.user.profile.propic %}
+          <div class="c-avatar"><img class="c-avatar-img" src="/static/assets/img/avatars/6.jpg" alt="user@email.com"></div>
+          {% else %}
+          <div class="c-avatar"><img class="c-avatar-img" src="{{propic.propic.url}}" alt="user@email.com"></div>
+          {% endif %}
+  
             </a>
             <div class="dropdown-menu dropdown-menu-right pt-0">
               <div class="dropdown-header bg-light py-2"><strong>Account</strong></div><a class="dropdown-item" href="#">
@@ -51,10 +56,10 @@
               <div class="dropdown-header bg-light py-2"><strong>Settings</strong></div><a class="dropdown-item" href="#">
                 <svg class="c-icon mr-2">
                   <use xlink:href="/static/assets/vendors/@coreui/icons/svg/free.svg#cil-user"></use>
-                </svg> Profile</a><a class="dropdown-item" href="#">
+                </svg> Profile</a><a class="dropdown-item" href="{% url 'profile' %}">
                 <svg class="c-icon mr-2">
                   <use xlink:href="/static/assets/vendors/@coreui/icons/svg/free.svg#cil-settings"></use>
-                </svg> Settings</a><a class="dropdown-item" href="#">
+                </svg> Settings</a><a class="dropdown-item" href="{% url 'update_profile' pk=request.user.id %}">
                 <svg class="c-icon mr-2">
                   <use xlink:href="/static/assets/vendors/@coreui/icons/svg/free.svg#cil-credit-card"></use>
                 </svg> Payments<span class="badge badge-secondary ml-auto">42</span></a><a class="dropdown-item" href="#">

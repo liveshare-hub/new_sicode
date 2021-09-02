@@ -3,6 +3,7 @@
 Copyright (c) 2019 - present AppSeed.us
 """
 
+from pathlib import Path
 import os
 from decouple import config
 from unipath import Path
@@ -17,10 +18,10 @@ SECRET_KEY = config('SECRET_KEY', default='S#perS3crEt_1122')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 #DEBUG = config('DEBUG', default=False)
-DEBUG = False
+DEBUG = True
 
 # load production server from .env
-ALLOWED_HOSTS = ['sicode.id','localhost', '127.0.0.1',
+ALLOWED_HOSTS = ['sicode.id', 'localhost', '127.0.0.1',
                  config('SERVER', default='127.0.0.1')]
 
 # Application definition
@@ -49,8 +50,8 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'core.urls'
-LOGIN_REDIRECT_URL = "home-klaim"   # Route defined in app/urls.py
-LOGOUT_REDIRECT_URL = "home-klaim"  # Route defined in app/urls.py
+LOGIN_REDIRECT_URL = "home"   # Route defined in app/urls.py
+LOGOUT_REDIRECT_URL = "home"  # Route defined in app/urls.py
 TEMPLATE_DIR = os.path.join(
     BASE_DIR, "core/templates")  # ROOT dir for templates
 
@@ -65,6 +66,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                # custom context processor
+                'authentication.context_processors.ProPic',
             ],
         },
     },
@@ -75,23 +78,22 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-#     }
-# }
-
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': '_my_data',
-        'USER': '_admin',
-        'PASSWORD': 'password',
-        'HOST': 'localhost',
-        'PORT': '',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'sicode',
+#         'USER': 'postgres',
+#         'PASSWORD': 'Welcome2021',
+#         'HOST': 'localhost'
+#     }
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
@@ -128,14 +130,13 @@ USE_TZ = True
 #############################################################
 # SRC: https://devcenter.heroku.com/articles/django-assets
 
-from pathlib import Path
 
 # BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
-#STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATIC_URL = '/static/'
 
 # Extra places for collectstatic to find static files.
@@ -145,18 +146,20 @@ STATICFILES_DIRS = (
 #############################################################
 #############################################################
 
-STATIC_ROOT = '/home/sicm6455/python/public/'
+# STATIC_ROOT = '/home/sicm6455/python/public/'
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = '/home/sicm6455/python/media/'
-# MEDIA_ROOT = BASE_DIR / 'media'
+# MEDIA_ROOT = '/home/sicm6455/python/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = '587'
-EMAIL_HOST_USER = 'email_gmail'
-EMAIL_HOST_PASSWORD = 'password'
+EMAIL_HOST_USER = 'syafii.newbie2@gmail.com'
+EMAIL_HOST_PASSWORD = 'Rahasia007123#$'
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
 
+
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"

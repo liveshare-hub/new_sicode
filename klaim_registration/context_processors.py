@@ -1,8 +1,9 @@
-from .models import DaftarHRD
+from .models import Profile
 from django.contrib.auth.models import User
 
+
 def userHRD(request):
-    hrd = DaftarHRD.objects.get(user__username=request.user)
+    hrd = Profile.objects.get(user__username=request.user, is_hrd=True)
     if request.user == 'Anonymous':
         pass
-    return {'hrd':hrd}
+    return {'hrd': hrd}

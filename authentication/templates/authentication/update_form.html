@@ -1,0 +1,97 @@
+{% extends 'layouts/base.html' %}
+
+{% load static %}
+
+{% block title %}
+Update Profile
+{% endblock  %}
+
+{% block stylesheets %}{% endblock  %}
+
+{% block content %}
+    <main class="c-main">
+        <div class="container-fluid">
+            <div class="fade-in">
+                <div class="row">
+                    <div class="col">
+                       <form method="POST" enctype="multipart/form-data">
+                       {% csrf_token %}
+                            <div class="row">
+                                
+                                <div class="col-9">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            Update Profile <b>{{qs.user}}</b>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="col-6">
+                                                
+                                            <div class="row">
+                                                <div class="col">
+                                                {% if qs.propic %}
+                                                    <img src="{{qs.propic.url}}" class="rounded-circle float-start">
+                                                {% else %}
+                                                    <img src="{% static 'media/profile/profile_none.png' %}" class="rounded-circle float-start" alt="avatar">
+                                                {% endif %}
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col mt-2">
+                                                    {{form.propic}}
+                                                    {{form.propic.errors}}
+                                                </div>
+                                            </div>
+                                            </div>
+                                            <div class="row-mb-2">
+                                                <div class="col mt-2">
+                                                    <label for="nama">Nama Lengkap</label>
+                                                    {{form.nama}}
+                                                </div>
+                                                <div class="col mt-2">
+                                                    <label for="npp">NPP</label>
+                                                    {{form.npp}}
+                                                </div>
+                                                <div class="col mt-2">
+                                                    <label for="nik">NIK</label>
+                                                    {{form.nik}}
+                                                </div>
+                                                <div class="col mt-2">
+                                                    <label for="tempat_lahir">Tempat Lahir</label>
+                                                    {{form.tempat_lahir}}
+                                                </div>
+                                                <div class="col-5 mt-2">
+                                                    <label for="tgl_lahir">Tgl Lahir</label>
+                                                    {{form.tgl_lahir}}
+                                                    {{form.tgl_lahir.errors}}
+                                                </div>
+                                            </div>
+                                            <div class="row-mb-2 mt-2">
+                                                <div class="col">
+                                                    <label for="no_hp">No.Hp/Whatsapp</label>
+                                                    {{form.no_hp}}
+                                                    {{form.no_hp.errors}}
+                                                </div>
+                                                <div class="col mt-2">
+                                                    <label for="is_hrd">Apakah HRD ?</label>
+                                                </div>
+                                                <div class="row-mb-2">
+                                                    <div class="col-2">
+                                                        {{form.is_hrd}}
+                                                        {{form.is_hrd.errors}}
+                                                    </div>
+                                                    <div class="col">
+                                                        <button type="submit" class="btn btn-primary float-right">Submit</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                       </form> 
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+{% endblock  %}

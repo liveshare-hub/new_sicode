@@ -1,9 +1,9 @@
 from django.contrib import admin
 
-from .models import DataKlaim, Perusahaan, DaftarHRD, ApprovalHRD, toQRCode
+from .models import DataKlaim, ApprovalHRD, toQRCode, DataTK, NoKPJ
 
 admin.site.register(DataKlaim)
-admin.site.register(Perusahaan)
-admin.site.register(DaftarHRD)
+admin.site.register(DataTK)
 admin.site.register(ApprovalHRD)
 admin.site.register(toQRCode)
+admin.site.register(NoKPJ)

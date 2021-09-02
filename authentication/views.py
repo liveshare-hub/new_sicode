@@ -2,16 +2,18 @@
 """
 Copyright (c) 2019 - present AppSeed.us
 """
-
-from django.shortcuts import render
-
+from django.contrib import messages
 # Create your views here.
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login
-from django.contrib.auth.models import User
+from django.contrib.auth.models import Group, User
 from django.forms.utils import ErrorList
 from django.http import HttpResponse
+from django.contrib.auth.hashers import make_password
 from .forms import LoginForm, SignUpForm, ProfileForm
+
+from klaim_registration.form import DataTK
+from .models import Profile
 
 
 def login_view(request):
@@ -46,13 +48,17 @@ def register_user(request):
         if form.is_valid():
             form.save()
             username = form.cleaned_data.get("username")
-            raw_password = form.cleaned_data.get("password1")
-            user = authenticate(username=username, password=raw_password)
+            raw_password1 = form.cleaned_data.get("password1")
+            raw_password2 = form.cleaned_data.get("password2")
+            if raw_password1 != raw_password2:
+                msg = 'Password tidak sama'
+            else:
+                user = authenticate(username=username, password=raw_password1)
 
-            msg = 'User created - please <a href="/login">login</a>.'
-            success = True
+                msg = 'User created - please <a href="/login">login</a>.'
+                success = True
 
-            # return redirect("/login/")
+                return redirect("register")
 
         else:
             msg = 'Form is not valid'
@@ -62,16 +68,66 @@ def register_user(request):
     return render(request, "accounts/register.html", {"form": form, "msg": msg, "success": success})
 
 
-def settingProfile(request):
+def DetilProfile(request):
+    qs = Profile.objects.select_related(
+        'user').filter(user__username=request.user)
+    context = {
+        'datas': qs
+    }
+    return render(request, 'authentication/profile.html', context)
+
+
+def DetilProfileTK(request, pk):
+    qs = Profile.objects.select_related('user').filter(pk=pk)
+    context = {
+        'datas': qs
+    }
+    return render(request, 'authentication/profile.html', context)
+
+
+def settingProfile(request, pk):
+    qs = get_object_or_404(Profile, pk=pk)
 
     if request.method == 'POST':
         form = ProfileForm(request.POST, request.FILES,
-                           instance=request.user.profile)
+                           instance=qs)
         if form.is_valid():
+
             post = form.save(commit=False)
+            post.npp = form.cleaned_data['npp']
+            post.nama = form.cleaned_data['nama']
+            post.tgl_lahir = form.cleaned_data['tgl_lahir']
+            post.tempat_lahir = form.cleaned_data['tempat_lahir']
+            post.nik = form.cleaned_data['nik']
+            post.no_hp = form.cleaned_data['no_hp']
+            post.is_hrd = form.cleaned_data['is_hrd']
+            # DataTK.objects.select_related('profile').create(
+            #     profile_id=request.user.profile.id)
             post.save()
 
-            return redirect('profile')
+            return redirect('list-kpj')
     else:
-        form = ProfileForm(instance=request.user.profile)
-    return render(request, "accounts/profile.html", {'form': form})
+        form = ProfileForm(instance=qs)
+
+    return render(request, "authentication/update_form.html", {'form': form, 'qs': qs})
+
+
+# def registerHRD(request):
+#     if request.method == 'POST':
+#         form = DaftarHRDForm(request.POST)
+#         if form.is_valid():
+#             post = form.save(commit=False)
+#             username = post.npp.npp
+#             password = make_password('WELCOME1', salt=['username'])
+#             buat_user = User.objects.create(
+#                 username=username, password=password)
+#             post.user__username = buat_user.username
+#             print(buat_user.id)
+#             group = Group.objects.get(name='hrd')
+#             buat_user.groups.add(group)
+#             post.save()
+#             messages.SUCCESS(request, 'Akun '+username+' berhasil dibuat')
+#             return redirect('login')
+#     else:
+#         form = DaftarHRDForm()
+#     return render(request, "accounts/register.html", {'form': form})

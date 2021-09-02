@@ -7,22 +7,29 @@ from django.template import RequestContext
 from .forms import CreateUserForm
 from klaim_registration.models import DaftarHRD
 
+
 def RegistrationPage(request):
     form = CreateUserForm()
 
     if request.method == 'POST':
         form = CreateUserForm(request.POST)
         if form.is_valid():
+            post = form.save(commit=False)
+
             form.save()
             user = form.cleaned_data.get('username')
+            npp = form.cleaned_data.get('npp')
+            nama = form.cleaned_data.get('nama')
+            DaftarHRD.objects.create(nama=nama, npp=npp, user=user)
             messages.success(request, 'Akun '+user+' sudah berhasil dibuat')
             return redirect('login')
     else:
-        
+
         context = {
-            'form':form
+            'form': form
         }
-    return render(request, 'accounts/register.html',context)
+    return render(request, 'accounts/register.html', context)
+
 
 def LoginPage(request):
     if request.method == 'POST':
@@ -44,7 +51,8 @@ def LoginPage(request):
             messages.info(request, 'Username or Password is incorrect!')
     context = {}
 
-    return render(request,'accounts/login.html', context)
+    return render(request, 'accounts/login.html', context)
+
 
 def LogoutPage(request):
     logout(request)

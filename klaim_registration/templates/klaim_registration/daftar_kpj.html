@@ -1,0 +1,89 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block title %}
+Input No KPJ
+{% endblock  %}
+
+{% block stylesheets %}{% endblock  %}
+
+{% block content %}
+<main class="c-main">
+    <div class="container-fluid">
+        <div class="fade-in">
+            <div class="row">
+                <div class="col-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <form method="post">
+                                {% csrf_token %}
+                                <div class="row mb-2">
+                                    <div class="col">
+                                        {{form.no_kpj}}
+                                        {{form.no_kpj.errors}}
+                                    </div>
+                                    <div class="col">
+                                        {{form.nama}}
+                                        {{form.errors.nama}}
+                                    </div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col">
+                                        {{form.blth_keps}}
+                                        {{form.blth_keps.errors}}
+                                    </div>
+                                    <div class="col">
+                                        {{form.is_aktif}}
+                                    </div>
+                                    
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col">
+                                        {{form.blth_na}}
+                                        {{form.blth_na.errors}}
+                                    </div>
+                                    <div class="col">
+                                        <button type="submit" class="btn btn-primary float-right">Submit</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+{% endblock  %}
+
+{% block javascripts %}
+<script>
+    $('#add_more').click(function() {
+        var form_idx = $('#id_nokpj_set-TOTAL_FORMS').val();
+        $('#form_set').append($('#empty_form').html().replace(/__prefix__/g, form_idx));
+        $('#id_nokpj_set-TOTAL_FORMS').val(parseInt(form_idx) + 1);
+    });
+</script>
+<script>
+    $(function(){
+        $('input[name="blth_na"]').hide();
+        update();
+        $('select[name="is_aktif"]').change(function(){
+            
+            update();
+        })
+    })
+    function update() {
+			var option = $('select[name="is_aktif"]').find("option:selected");
+            var optionText = option.text();
+            if(optionText === 'Aktif'){
+                $('input[name="blth_na"]').hide();
+            }
+            else{
+                $('input[name="blth_na"]').show();
+            }
+			}
+    
+</script>
+{% endblock  %}

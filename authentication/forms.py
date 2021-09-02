@@ -6,7 +6,7 @@ Copyright (c) 2019 - present AppSeed.us
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import Profile
+from .models import Profile, Perusahaan
 
 
 class LoginForm(forms.Form):
@@ -34,13 +34,6 @@ class SignUpForm(UserCreationForm):
                 "class": "form-control"
             }
         ))
-    email = forms.EmailField(
-        widget=forms.EmailInput(
-            attrs={
-                "placeholder": "Email",
-                "class": "form-control"
-            }
-        ))
     password1 = forms.CharField(
         widget=forms.PasswordInput(
             attrs={
@@ -58,16 +51,41 @@ class SignUpForm(UserCreationForm):
 
     class Meta:
         model = User
-        fields = ('username', 'email', 'password1', 'password2')
+        fields = ('username', 'password1', 'password2')
 
 
-class ProfileForm(forms.Form):
+class ProfileForm(forms.ModelForm):
+    npp = forms.ModelChoiceField(required=False, queryset=Perusahaan.objects.all(), widget=forms.Select(attrs={
+        'class': 'form-control'
+    }))
+
     class Meta:
         model = Profile
-        fields = ('propic',)
+        fields = ('propic', 'nama', 'tgl_lahir',
+                  'tempat_lahir', 'nik', 'no_hp', 'is_hrd',)
+        exclude = ('user',)
 
         widgets = {
             'propic': forms.FileInput(attrs={
                 'class': 'from-control'
+            }),
+
+            'nama': forms.TextInput(attrs={
+                'class': 'form-control', 'placeholder': 'Nama Lengkap'
+            }),
+            'tgl_lahir': forms.DateInput(attrs={
+                'class': 'form-control', 'type': 'date'
+            }),
+            'tempat_lahir': forms.TextInput(attrs={
+                'class': 'form-control', 'placeholder': 'Tempat Lahir'
+            }),
+            'nik': forms.TextInput(attrs={
+                'class': 'form-control', 'placeholder': 'No KTP'
+            }),
+            'no_hp': forms.TextInput(attrs={
+                'class': 'form-control', 'placeholder': 'No. Handphone'
+            }),
+            'is_hrd': forms.Select(attrs={
+                'class': 'form-control'
             })
         }
