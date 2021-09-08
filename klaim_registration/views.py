@@ -11,7 +11,7 @@ import random
 import string
 
 from django.core import serializers
-from django.forms import inlineformset_factory
+from django.forms import inlineformset_factory, modelformset_factory
 
 from .form import DataKlaimForm, DataTKForm, KPJForm
 from .models import DataKlaim, ApprovalHRD, toQRCode, DataTK, NoKPJ
@@ -62,7 +62,7 @@ def index(request):
 def listKPJ(request):
     if request.user.profile.is_hrd:
         datas_aktif = NoKPJ.objects.select_related(
-            'user_kpj').filter(user_kpj__npp_id=request.user.profile.npp_id, is_aktif=True)
+            'user_kpj').filter(user_kpj__npp_id=request.user.profile.npp_id)
         datas_na = NoKPJ.objects.select_related('user_kpj').filter(
             user_kpj__npp_id=request.user.profile.npp_id, is_aktif=False)
     context = {
@@ -114,14 +114,18 @@ def tambahKPJ(request, pk):
     # print(user)
     KpjInlineFormset = inlineformset_factory(
         Profile, NoKPJ, fields=('no_kpj', 'blth_keps', 'blth_na', 'is_aktif',), extra=1)
-    # formset = KpjInlineFormset(queryset=Profile.objects.none(), instance=user)
+
+    # formset = KpjInlineFormset(
+    # queryset=Profile.objects.none(), instance=user)
     if request.method == 'POST':
-        formset = KpjInlineFormset(request.POST, instance=user)
+        formset = KpjInlineFormset(
+            request.POST or None, instance=user)
         if formset.is_valid():
+
             formset.save()
             return redirect(reverse('list-kpj'))
     else:
-        formset = KpjInlineFormset(instance=user)
+        formset = KpjInlineFormset(queryset=Profile.objects.none())
     return render(request, 'klaim_registration/input_kpj.html', {'forms': formset})
 
 
