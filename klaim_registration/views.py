@@ -1,3 +1,4 @@
+from django.db.models.query import QuerySet
 from django.shortcuts import render, redirect, reverse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.hashers import make_password
@@ -165,13 +166,14 @@ def TambahTK(request):
     user = Profile.objects.get(user=request.user)
     npp = user.npp_id
     # data = NoKPJ.objects.all()
+    # data_kpj = NoKPJ.objects.get(pk=pk)
     if request.method == 'POST':
         form = DataTKForm(request.POST, request.FILES)
 
         if form.is_valid():
             post = form.save(commit=False)
+            post.kpj_id = form.cleaned_data['kpj'].id
             post.nik = form.cleaned_data['nik']
-            post.tgl_lahir = form.cleaned_data['tgl_lahir']
             post.alamat = form.cleaned_data['alamat']
             post.nama_ibu = form.cleaned_data['nama_ibu']
             post.status = form.cleaned_data['status']
@@ -182,26 +184,11 @@ def TambahTK(request):
             post.tgl_lahir_s = form.cleaned_data['tgl_lahir_s']
             post.nama_anak_d = form.cleaned_data['nama_anak_d']
             post.tgl_lahir_d = form.cleaned_data['tgl_lahir_d']
-            # post.tgl_aktif = form.cleaned_data['tgl_aktif']
-            # nama = request.POST.get('nama')
-            # x = list(nama)
-            # m = (x[0]+x[1]).upper()
-            # str_digits = string.digits
-            # username = m+(''.join(random.choice(str_digits)for i in range(6)))
-            # password = make_password('WELCOME1', salt=[username])
-            # cek = User.objects.filter(username=username)
-            # if cek.exists():
-            #     messages.WARNING(request, "User Sudah Terpakai")
-            # else:
-            #     buat_user = User.objects.create(
-            #         username=username, password=password)
-            #     post.user_id = buat_user.id
             post.save()
             return redirect(reverse(('home')))
     else:
         form = DataTKForm()
-        form2 = KPJForm()
-    return render(request, 'klaim_registration/daftar_tk.html', {'form': form, 'kpj': form2})
+    return render(request, 'klaim_registration/daftar_tk.html', {'form': form})
 
 
 @ login_required(login_url='/accounts/login/')

@@ -12,7 +12,7 @@ urlpatterns = [
     path('daftar/kpj/<int:pk>/', views.tambahKPJ, name='add-kpj'),
     path('input/kpj/', views.daftarKPJ, name='daftar-kpj'),
     path('daftar/', views.tambahKlaim1, name='add'),
-    path('hrd/tk/', views.DaftarTk, name='hrd-tk'),
+    path('pengkinian/tk/<int:pk>/', views.DaftarTk, name='hrd-tk'),
     path('hrd/klaim/', views.get_detail_tk, name='get-detail'),
     path('daftar/kpj/json/', views.DataTKJson, name='tk-json'),
     path('hrd/klaim/<int:klaim_id>/',

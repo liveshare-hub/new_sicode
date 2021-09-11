@@ -64,16 +64,21 @@ class DataKlaimForm(forms.ModelForm):
 class DataTKForm(forms.ModelForm):
     kpj = forms.ModelChoiceField(
         required=False, queryset=NoKPJ.objects.all(), widget=forms.Select(attrs={
-            'class': 'form-control'
+            'class': 'form-control data-select'
         }))
 
     # def __init__(self, *args, **kwargs):
-    #     user_id = kwargs.pop('user_id', None)
+    #     pk = kwargs.pop('kpj', None)
+
     #     super(DataTKForm, self).__init__(*args, **kwargs)
+    #     if pk:
+    #         kpj_pk = NoKPJ.objects.get(pk=pk)
+    #         self.fields['kpj'].queryset = kpj_pk
 
     class Meta:
         model = DataTK
-        fields = '__all__'
+        # fields = '__all__'
+        exclude = ('kpj',)
         widgets = {
             'nik': forms.TextInput(attrs={
                 'class': 'form-control', 'placeholder': 'No KTP'
@@ -88,19 +93,19 @@ class DataTKForm(forms.ModelForm):
                 'class': 'form-control', 'placeholder': 'Nama Suami/Istri'
             }),
             'tgl_lahir_pasangan': forms.DateInput(attrs={
-                'class': 'form-control'
+                'class': 'form-control', 'type': 'date'
             }),
             'nama_anak_s': forms.TextInput(attrs={
                 'class': 'form-control', 'placeholder': 'Nama Anak Pertama'
             }),
             'tgl_lahir_s': forms.DateInput(attrs={
-                'class': 'form-control'
+                'class': 'form-control', 'type': 'date'
             }),
             'nama_anak_d': forms.TextInput(attrs={
                 'class': 'form-control', 'placeholder': 'Nama Anak Kedua'
             }),
             'tgl_lahir_d': forms.DateInput(attrs={
-                'class': 'form-control'
+                'class': 'form-control', 'type': 'date'
             }),
             'status': forms.Select(attrs={
                 'class': 'form-control'

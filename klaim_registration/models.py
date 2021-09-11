@@ -83,7 +83,13 @@ class DataTK(models.Model):
 
     def __str__(self):
 
-        return '{} - {}'.format(self.kpj.no_kpj, self.kpj.profile.nama)
+        return '{} - {}'.format(self.kpj.no_kpj, self.kpj.user_kpj.nama)
+
+
+@receiver(post_save, sender=NoKPJ)
+def create_dataTk(sender, instance, created, **kwargs):
+    if created:
+        DataTK.objects.create(kpj=instance)
 
 
 class DataKlaim(models.Model):
@@ -109,9 +115,13 @@ class DataKlaim(models.Model):
         verbose_name_plural = "LIST DATA KLAIM"
 
     def __str__(self):
-        return self.data_tk.profile.no_kpj
+        return self.data_tk.kpj
 
 
+@receiver(post_save, sender=DataTK)
+def create_dataTk(sender, instance, created, **kwargs):
+    if created:
+        DataKlaim.objects.create(data_tk=instance)
 # class DaftarHRD(models.Model):
 #     user = models.ForeignKey(User, on_delete=models.CASCADE)
 #     nama = models.CharField(max_length=100)

@@ -23,12 +23,11 @@
                                     DATA TENAGA KERJA
                                 </div>
                             
-                                <div class="card-body">
+                                <div class="card-body" id="card-1">
                                     <div class="row mb-2">
                                         <div class="col">
                                             {{form.kpj}}
                                             {{form.kpj.errors}}
-                                            <div class="col"><a href="{% url 'add-kpj' %}">Input No KPJ</a></div>
                                         </div>
                                         <div class="col">
                                             {{form.nik}}
@@ -66,39 +65,19 @@
                                             {{form.email.errors}}
                                         </div>
                                     </div>
-                                    <div class="row mb-2">
-                                        <div class="col">
-                                            {{form.nama_rekening}}
-                                        </div>
-                                        <div class="col">
-                                            {{form.no_rekening}}
-                                            {{form.no_rekening.errors}}
-                                        </div>
-                                    </div>
-                                    <div class="row mb-2">
-                                        <div class="col">{{form.no_hp}}{{form.no_hp.errors}}
-                                            <label class="form-label">Format nomor hp : 08xxxxxx</label>
-                                        </div>
-                                        <div class="col">
-                                            {{form.propic}}
-                                            {{form.propic.errors}}
-                                            <label class="form-label">Upload Foto</label>
-                                        </div>
-                                        
-                                    </div>
                                     <div class="row mb-2"> 
                                         <div class="col">
                                             {{form.alamat}}
                                             {{form.alamat.errors}}
                                         </div>
                                     </div>
-                                    
+                                    <div class='d-flex justify-content-end' id="btn1"><button type='submit' class='btn btn-info'>Submit</button></div>
                                 </div>
 
                                 <div class="card-header">
                                     DATA KELUARGA
                                 </div>
-                                <div name="pasangan" class="card-body">
+                                <div name="pasangan" class="card-body" id="card-2">
                                     <div class="row mb-2">
                                         <div class="col">
                                             {{form.nama_pasangan}}
@@ -129,29 +108,11 @@
                                             {{form.tgl_lahir_d.errors}}
                                         </div>
                                     </div>
+                                    <div class='d-flex justify-content-end' id="btn2"><button type='submit' class='btn btn-info'>Submit</button></div>
                                 </div> 
                             </div>
                         </div>
                         </div>
-                        <div class="row">
-                            <div class="col">
-                            
-                            <div>
-                        </div>
-                        <div class="row">
-                            <div class="col">
-                                <div class="card">
-                                <div class="card-header">
-                                    INPUT KPJ
-                                </div>
-                                <div class="card-body text-end">
-                                        {{kpj.no_kpj}}
-                                    <button type="button" class="btn btn-primary mt-2 float-right" name="cari">Cari</button>
-                                </div>
-                            </div>
-                            </div>
-                        </div>
-
                     </form>
                 </div>
             </div>
@@ -166,13 +127,14 @@
 {% block javascripts %}
 <script>
 $(document).ready(function(){
-    $('#id_npp').select2();
+    $('.data-select').select2();
 })
 </script>
 
 <script>
+var btn = "<div class='d-flex justify-content-end'><button type='submit' class='btn btn-info'>Submit</button></div>"
 $(document).ready(function() {
-    $('div[name="pasangan"]').hide();
+    $("div[name='pasangan'] input[class='form-control']").hide();
     showhide();
     $("#id_status").change(function () {
         showhide();
@@ -182,12 +144,16 @@ $(document).ready(function() {
 
 function showhide(){
       if( $('select[name="status"]').val() == 2){
-            console.log('Menikah')
-            $('div[name="pasangan"]').show();
+            
+            $("div[name='pasangan'] input[class='form-control']").show();
+            $("#btn1 button").hide();
+            $("#btn2 button").show();
         }
     else{
-            $('div[name="pasangan"]').hide();
-            //console.log('Salah')
+            $("div[name='pasangan'] input[class='form-control']").hide();
+            $("#btn2 button").hide();
+            $("#btn1 button").show();
+
         }
 }
 </script>
@@ -209,11 +175,5 @@ $(document).ready(function() {
 
 </script>
 
-<script>
-    $('#add_more').click(function() {
-        var form_idx = $('#id_nokpj_set-TOTAL_FORMS').val();
-        $('#form_set').append($('#empty_form').html().replace(/__prefix__/g, form_idx));
-        $('#id_nokpj_set-TOTAL_FORMS').val(parseInt(form_idx) + 1);
-    });
-</script>
+
 {% endblock  %}
