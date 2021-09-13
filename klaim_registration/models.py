@@ -115,7 +115,7 @@ class DataKlaim(models.Model):
         verbose_name_plural = "LIST DATA KLAIM"
 
     def __str__(self):
-        return self.data_tk.kpj
+        return self.data_tk.kpj.user_kpj.nama
 
 
 @receiver(post_save, sender=DataTK)

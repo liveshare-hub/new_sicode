@@ -118,7 +118,7 @@ class DataTKForm(forms.ModelForm):
 
 class KPJForm(forms.ModelForm):
     nama = forms.CharField(max_length=100, widget=forms.TextInput(attrs={
-        'class': 'form-control', 'placeholder': 'Nama Lengkap'
+        'class': 'form-control', 'placeholder': 'Nama Lengkap',
     }))
 
     class Meta:

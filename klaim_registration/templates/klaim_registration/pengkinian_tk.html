@@ -1,0 +1,138 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block tilte %}LIST DATA PENGKINIAN{% endblock  %}
+
+{% block stylesheets %}
+
+
+{% endblock  %}
+
+{% block breadcrumb %}
+
+{% endblock  %}
+{% block content %}
+
+{% for message in messages  %}
+  <div class="alert alert-warning" role="alert" id="warning-alert">
+    {{message}}
+  </div>
+{% endfor %}
+
+  <main class="c-main">
+    <div class="container-fluid">
+      <div class="fade-in">
+        <div class="row">
+          <div class="col-lg-xl">
+            <div class="card">
+              <div class="card-header"><i class="fa fa-align-justify"></i> Daftar Klaim</div>
+              <div class="card-body">
+              
+  
+  <table id="example" class="table table-responsive table-bordered table-striped">
+      <thead>
+          <tr>
+          <th></th>
+          <th scope="col">KPJ</th>
+          <th scope="col">NAMA</th>
+          <th scope="col">NIK</th>
+          <th scope="col">Alamat</th>
+          <th scope="col">Nama Ibu Kandung</th>
+          <th scope="col">Status </br>Pernikahan</th>
+          </tr>
+    </thead>
+   
+  </table>
+
+
+</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+{% endblock  %}
+
+{% block javascripts %}
+<script>
+/* Formatting function for row details - modify as you need */
+    function format ( d ) {
+        // `d` is the original data object for the row
+        if (d.status == 1) { 
+            d.nama_pasangan = '-';
+            d.tgl_lahir_pasangan = '-';
+            d.nama_anak_s = '-';
+            d.tgl_lahir_s = '-';
+            d.nama_anak_d = '-';
+            d.tgl_lahir_d = '-'
+        }
+        
+        return '<table cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">'+
+            '<tr>'+
+                '<td>Nama Istri:</td>'+
+                '<td>'+d.nama_pasangan+'</td>'+
+            '</tr>'+
+            '<tr>'+
+                '<td>Tgl. Lahir:</td>'+
+                '<td>'+d.tgl_lahir_pasangan+'</td>'+
+            '</tr>'+
+            '<tr>'+
+                '<td>Nama Anak ke-I:</td>'+
+                '<td>'+d.nama_anak_s+'</td>'+
+            '</tr>'+
+            '<tr>'+
+                '<td>Tgl. Lahir</td>'+
+                '<td>'+d.tgl_lahir_s+'</td>'+
+            '</tr>'+
+                '<td>Nama Anak ke-II</td>'+
+                '<td>'+d.nama_anak_d+'</td>'+
+            '<tr>'+
+                '<td>Tgl. Lahir</td>'+
+                '<td>'+d.tgl_lahir_d+'</td>'+
+            '</tr>'+
+        '</table>';
+    }
+
+    $(document).ready(function() {
+        var table = $('#example').DataTable( {
+            "ajax": "{% url 'pengkinian-json' %}",
+            "columns": [
+                {
+                    "className": "details-control",
+                    "orderable": false,
+                    "data": null,
+                    "defaultContent": ''
+                },
+                { "data": "kpj__no_kpj" },
+                { "data": "kpj__user_kpj__nama" },
+                { "data": "nik" },
+                { "data": "alamat" },
+                { "data": "nama_ibu"},
+                { "data": "status"}
+            ],
+            "order": [[1, 'asc']]
+        });
+        
+        // Add event listener for opening and closing details
+        $('#example tbody').on('click', 'td.details-control', function () {
+            var tr = $(this).closest('tr');
+            var row = table.row( tr );
+    
+            if ( row.child.isShown() ) {
+                // This row is already open - close it
+                row.child.hide();
+                tr.removeClass('shown');
+            }
+            else {
+                // Open this row
+                row.child( format(row.data()) ).show();
+                tr.addClass('shown');
+            }
+        } );
+    } );
+
+</script>
+
+{% endblock javascripts %}

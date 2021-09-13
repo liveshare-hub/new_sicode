@@ -23,7 +23,7 @@
                                     DATA TENAGA KERJA
                                 </div>
                             
-                                <div class="card-body" id="card-1">
+                                <div class="card-body" id="card-1" style="background-color:#F8F5F1">
                                     <div class="row mb-2">
                                         <div class="col">
                                             {{form.kpj}}
@@ -74,7 +74,7 @@
                                     <div class='d-flex justify-content-end' id="btn1"><button type='submit' class='btn btn-info'>Submit</button></div>
                                 </div>
 
-                                <div class="card-header">
+                                <div class="card-header" id="card-2">
                                     DATA KELUARGA
                                 </div>
                                 <div name="pasangan" class="card-body" id="card-2">
@@ -134,6 +134,10 @@ $(document).ready(function(){
 <script>
 var btn = "<div class='d-flex justify-content-end'><button type='submit' class='btn btn-info'>Submit</button></div>"
 $(document).ready(function() {
+    $(".card-header").css("background-color","#F8A488")
+    $(".card-body").css("background-color","#5AA897")
+    $(".btn").css({"background-color":"#45526C","broder-style":"none","outline":"none"})
+    $("#card-2").hide();
     $("div[name='pasangan'] input[class='form-control']").hide();
     showhide();
     $("#id_status").change(function () {
@@ -145,11 +149,13 @@ $(document).ready(function() {
 function showhide(){
       if( $('select[name="status"]').val() == 2){
             
+            $("#card-2 ").show();
             $("div[name='pasangan'] input[class='form-control']").show();
             $("#btn1 button").hide();
             $("#btn2 button").show();
         }
     else{
+            $("#card-2").hide();
             $("div[name='pasangan'] input[class='form-control']").hide();
             $("#btn2 button").hide();
             $("#btn1 button").show();

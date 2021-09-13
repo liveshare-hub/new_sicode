@@ -44,7 +44,7 @@
                   <tr class="text-center data">
                       <td>{{forloop.counter}}</td>
                       <td><a href="{% url 'profile-tk' data.user_kpj.id%}">{{data.user_kpj.nama}}</a></td>
-                      <td>{{data.no_kpj}}</td>
+                      <td><a href="{% url 'pengkinian-tk' data.user_kpj.id %}">{{data.no_kpj}}</a></td>
                       {% if data.blth_keps %}
                       <td>{{data.blth_keps}}</td>
                       {% else %}

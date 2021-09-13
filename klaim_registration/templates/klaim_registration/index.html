@@ -51,6 +51,9 @@
     </thead>
     <tbody>
     {% for data in datas  %}
+      {% if not data.email %}
+      <tr></tr>
+      {% else %}
       <tr>
           <td>{{forloop.counter}}</td>
           <td>{{data.nama}}</td>
@@ -62,24 +65,36 @@
           <td>{{data.nama_ibu}}</td>
           <td>{{data.get_status_display}}</td>
           <td>{{data.no_rekening}}</td>
+          {% if data.file_kk %}
           <td><a href="{{ data.file_kk.url }}" class="badge bg-info text-dark" rel="noopener noreferrer">Download</a></td>
+          {% else %}
+          <td> - </td>
+          {% endif %}
+          {% if data.file_ktp %}
           <td><a href="{{ data.file_ktp.url }}" class="badge bg-info text-dark" rel="noopener noreferrer">Download</a></td>
+          {% else %}
+          <td> - </t>
+          {% endif %}
+          {% if data.file_buku_nikah %}
           <td><a href="{{ data.file_buku_nikah.url }}" class="badge bg-info text-dark" rel="noopener noreferrer">Download</a></td>
+          {% else %}
+          <td> - </td>
+          {% endif %}
           {% if data.file_lain %}
             <td><a href="{{ data.file_lain.url }}" class="badge bg-info text-dark" rel="noopener noreferrer">Download</a></td>
           {% else %}
-            <td>Belum Upload</td>
+            <td> - </td>
           {% endif %}
-          {% if data.status_approve == 'DALAM PEMERIKSAAN' %}
-            <td><span class="badge bg-info text-dark">DALAM PROSES</span></td>
-          {% elif data.status_approve == 'DISETUJUI'%}
-            <td><span class="badge bg-success">SETUJU</span></td>
+          {% if data.status_approve == 'DISETUJUI' %}
+            <td><span class="badge bg-info text-dark">DISETUJUI</span></td>
+          {% elif data.status_approve == 'DITOLAK'%}
+            <td><span class="badge bg-success">DITOLAK</span></td>
           {% else %}
-            <td><span class="badge bg-danger">DITOLAK</span></td>
+            <td><span class="badge bg-info">DALAM</br>PEMERIKSAAN</span></td>
           {% endif %}
           
       </tr>
-    
+    {% endif %}
     {% endfor %}
     
     </tbody>

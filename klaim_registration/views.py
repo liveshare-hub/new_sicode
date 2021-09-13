@@ -60,35 +60,55 @@ def index(request):
     return render(request, 'klaim_registration/index.html', context)
 
 
+@login_required(login_url='/accounts/login/')
+@admin_only
 def listKPJ(request):
     if request.user.profile.is_hrd:
         datas_aktif = NoKPJ.objects.select_related(
             'user_kpj').filter(user_kpj__npp_id=request.user.profile.npp_id)
         datas_na = NoKPJ.objects.select_related('user_kpj').filter(
             user_kpj__npp_id=request.user.profile.npp_id, is_aktif=False)
+        datas_tk = DataTK.objects.select_related('kpj').filter(
+            kpj__user_kpj__npp_id=request.user.profile.npp_id)
     context = {
         'datas': datas_aktif,
-        'datas_na': datas_na
+        'datas_na': datas_na,
+        'datatk': datas_tk
     }
     return render(request, 'klaim_registration/list_kpj.html', context)
 
 
 @login_required(login_url='/accounts/login/')
 @admin_only
+def ListDataTerkini(request):
+    user = request.user
+    # print(user.profile.npp_id)
+    datas = DataTK.objects.select_related('kpj').filter(
+        kpj__user_kpj__npp_id=user.profile.npp_id)
+    context = {
+        'datas': datas
+    }
+    return render(request, 'klaim_registration/pengkinian_tk.html', context)
+
+
+@login_required(login_url='/accounts/login/')
+@admin_only
 def daftarKPJ(request):
+
     if request.method == 'POST':
         form = KPJForm(request.POST)
         if form.is_valid():
             post = form.save(commit=False)
             nama = request.POST.get('nama')
+            nik = request.POST.get('nik')
             x = list(nama)
             m = (x[0]+x[1]).upper()
             str_digits = string.digits
             username = m+(''.join(random.choice(str_digits)for i in range(6)))
             password = make_password('WELCOME1', salt=[username])
-            cek = User.objects.filter(username=username)
+            cek = Profile.objects.filter(nama=nama, nik=nik)
             if cek.exists():
-                messages.WARNING(request, "User Sudah Terpakai")
+                post.user_kpj_id = cek[0].id
             else:
                 buat_user = User.objects.create(
                     username=username, password=password)
@@ -168,7 +188,7 @@ def TambahTK(request):
     # data = NoKPJ.objects.all()
     # data_kpj = NoKPJ.objects.get(pk=pk)
     if request.method == 'POST':
-        form = DataTKForm(request.POST, request.FILES)
+        form = DataTKForm(request.POST)
 
         if form.is_valid():
             post = form.save(commit=False)
@@ -188,6 +208,34 @@ def TambahTK(request):
             return redirect(reverse(('home')))
     else:
         form = DataTKForm()
+    return render(request, 'klaim_registration/daftar_tk.html', {'form': form})
+
+
+def PengkinianTK(request, pk):
+    qs = get_object_or_404(DataTK, kpj__user_kpj_id=pk)
+    # qs = DataTK.objects.select_related(
+    # 'kpj').filter(kpj__user_kpj_id=pk).first()
+
+    if request.method == 'POST':
+        form = DataTKForm(request.POST)
+
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.kpj_id = form.cleaned_data['kpj'].id
+            post.nik = form.cleaned_data['nik']
+            post.alamat = form.cleaned_data['alamat']
+            post.nama_ibu = form.cleaned_data['nama_ibu']
+            post.status = form.cleaned_data['status']
+            post.nama_pasangan = form.cleaned_data['nama_pasangan']
+            post.tgl_lahir_pasangan = form.cleaned_data['tgl_lahir_pasangan']
+            post.nama_anak_s = form.cleaned_data['nama_anak_s']
+            post.tgl_lahir_s = form.cleaned_data['tgl_lahir_s']
+            post.nama_anak_d = form.cleaned_data['nama_anak_d']
+            post.tgl_lahir_d = form.cleaned_data['tgl_lahir_d']
+            post.save()
+            return redirect(reverse(('list-pengkinian')))
+    else:
+        form = DataTKForm(instance=qs)
     return render(request, 'klaim_registration/daftar_tk.html', {'form': form})
 
 
@@ -313,6 +361,17 @@ def DataTKJson(request):
     return JsonResponse({'data': tk_json})
 
 
+def PengkinianJson(request):
+    user = request.user
+    pengkinian_json = list(DataTK.objects.select_related('kpj').filter(
+        kpj__user_kpj__npp_id=user.profile.npp_id).values('kpj__no_kpj', 'kpj__user_kpj__nama', 'nik', 'alamat', 'nama_ibu', 'status',
+                                                          'nama_pasangan', 'tgl_lahir_pasangan', 'nama_anak_s', 'tgl_lahir_s', 'nama_anak_d', 'tgl_lahir_d'))
+
+    return JsonResponse({'data': pengkinian_json})
+
+
+@ login_required(login_url='/accounts/login/')
+@ admin_only
 def get_detail_tk(request):
     datas = toQRCode.objects.select_related('tk_klaim').filter(
         tk_klaim__hrd__user__username=request.user, tk_klaim__status='DALAM PEMERIKSAAN')
