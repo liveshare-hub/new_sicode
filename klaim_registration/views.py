@@ -366,7 +366,11 @@ def PengkinianJson(request):
     pengkinian_json = list(DataTK.objects.select_related('kpj').filter(
         kpj__user_kpj__npp_id=user.profile.npp_id).values('kpj__no_kpj', 'kpj__user_kpj__nama', 'nik', 'alamat', 'nama_ibu', 'status',
                                                           'nama_pasangan', 'tgl_lahir_pasangan', 'nama_anak_s', 'tgl_lahir_s', 'nama_anak_d', 'tgl_lahir_d'))
-
+    for data in pengkinian_json:
+        if data['status'] == '1':
+            data['status'] = 'BELUM MENIKAH'
+        else:
+            data['status'] = 'MENIKAH'
     return JsonResponse({'data': pengkinian_json})
 
 
