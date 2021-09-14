@@ -26,108 +26,44 @@
                                     <div class="card-body">
                                         <div class="row mb-2">
                                             <div class="col">
-                                                {{forms.nama}}
-                                                {{forms.nama.errors}}
+                                                <input class="form-control" id="disabledInput" type="text" name="data_tk" placeholder="" value="{{qs}}" disabled>
                                             </div>
                                             <div class="col">
-                                                {{forms.nik}}
-                                                {{forms.nik.errors}}
+                                                <input class="form-control" id="disabledInput" type="text" name="nik" placeholder="" value="{{qs.kpj.user_kpj.nik}}" disabled>
                                             </div>
                                         </div>
                                         <div class="row mb-2">
                                             <div class="col">
-                                                {{forms.tempat_lahir}}
-                                                {{forms.tempat_lahir.errors}}
-                                            </div>
-                                            <div class="col">
-                                                {{forms.tgl_lahir}}
-                                                {{forms.tgl_lahir.errors}}
+                                                {{form.tipe_klaim}}
+                                                {{form.tipe_klaim.errors}}
                                             </div>
                                         </div>
                                         <div class="row mb-2">
                                             <div class="col">
-                                                {{forms.kpj}}
-                                                {{forms.kpj.errors}}
-                                            </div>
-                                            <div class="col">
-                                                {{forms.npp}}
-                                                {{forms.npp.errors}}
+                                                {{form.sebab_klaim}}
+                                                {{form.tgl_lahir.errors}}
                                             </div>
                                         </div>
                                         <div class="row mb-2">
                                             <div class="col">
-                                                {{forms.nama_ibu}}
-                                                {{forms.nama_ibu.errors}}
+                                                {{form.nama_rekening}}
+                                                {{form.nama_rekening.errors}}
                                             </div>
                                             <div class="col">
-                                                {{forms.status}}
-                                                {{forms.status.errors}}
+                                                {{form.no_rekening}}
+                                                {{form.no_rekening.errors}}
                                             </div>
                                         </div>
                                         <div class="row mb-2">
                                             <div class="col">
-                                                {{forms.email}}
-                                                {{forms.email.errors}}
-                                            </div>
-                                        </div>
-                                        <div class="row mb-2">
-                                            <div class="col">
-                                                {{forms.nama_rekening}}
+                                                <input class="form-control" id="disabledInput" type="text" name="nama_ibu" placeholder="" value="{{qs.nama_ibu}}" disabled>
                                             </div>
                                             <div class="col">
-                                                {{forms.no_rekening}}
-                                                {{forms.no_rekening.errors}}
+                                                {{form.email}}
+                                                {{form.email.errors}}
                                             </div>
-                                        </div>
-                                        <div class="row mb-2">
-                                            <div class="col">{{forms.no_hp}}{{forms.no_hp.errors}}
-                                            <label class="form-label">Format nomor hp : 08xxxxxx</label>
-                                            </div>
-                                            
-                                            <div class="col">
-                                                {{forms.alamat}}
-                                                {{forms.alamat.errors}}
-                                            </div>
-                                        </div>
-                                        
+                                        </div>            
                                     </div>
-
-                                    <div class="card-header">
-                                        DATA KELUARGA
-                                    </div>
-                                        <div name="pasangan" class="card-body">
-                                            <div class="row mb-2">
-                                                <div class="col">
-                                                    {{forms.nama_pasangan}}
-                                                    {{forms.nama_pasangan.errors}}
-                                                </div>
-                                                <div class="col">
-                                                    {{forms.tgl_lahir_pasangan}}
-                                                    {{forms.tgl_lahir_pasangan.errors}}
-                                                </div>
-                                            </div>
-                                            <div class="row mb-2">
-                                                <div class="col">
-                                                    {{forms.nama_anak_s}}
-                                                    {{forms.nama_anak_s.errors}}
-                                                </div>
-                                                <div class="col">
-                                                    {{forms.tgl_lahir_s}}
-                                                    {{forms.tgl_lahir_s.errors}}
-                                                </div>
-                                            </div>
-                                            <div class="row mb-2">
-                                                <div class="col">
-                                                    {{forms.nama_anak_d}}
-                                                    {{forms.nama_anak_d.errors}}
-                                                </div>
-                                                <div class="col">
-                                                    {{forms.tgl_lahir_d}}
-                                                    {{forms.tgl_lahir_d.errors}}
-                                                </div>
-                                            </div>
-                                        </div>
-                                
                             </div>
                         </div>
                         
@@ -140,29 +76,29 @@
                                     <div class="row mb-2">
                                         <div class="col">
                                             <label class="form-label">Upload Kartu Keluarga</label>
-                                            {{forms.file_kk}}
-                                            {{forms.file_kk.errors}}
+                                            {{form.file_kk}}
+                                            {{form.file_kk.errors}}
                                         </div>
                                     </div>
                                     <div class="row mb-2">
                                         <div class="col">
                                             <label class="form-label">Upload KTP</label>
-                                            {{forms.file_ktp}}
-                                            {{forms.file_ktp.errors}}
+                                            {{form.file_ktp}}
+                                            {{form.file_ktp.errors}}
                                         </div>
                                     </div>
                                     <div class="row mb-2">
                                         <div class="col">
-                                            <label class="form-label">Upload Buku Nikah</label>
-                                            {{forms.file_buku_nikah}}
-                                            {{forms.file_buku_nikah.errors}}
+                                            <label class="form-label">Upload Paklaring</label>
+                                            {{form.file_paklaring}}
+                                            {{form.file_paklaring.errors}}
                                         </div>
                                     </div>
                                     <div class="row mb-2">
                                         <div class="col">
                                             <label class="form-label">Upload File lain</label>
-                                            {{forms.file_lain}}
-                                            {{forms.file_lain.errors}}
+                                            {{form.file_lain}}
+                                            {{form.file_lain.errors}}
                                         </div>
                                     </div>
                                     <button type="submit" class="btn btn-primary">Daftarkan</button>

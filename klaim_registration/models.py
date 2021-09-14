@@ -29,6 +29,14 @@ SEGMEN = (
     ('JAKON', 'JASA KONSTRUKSI'),
 )
 
+TIPE_KLAIM = (
+    ('JHT01', 'JHT'),
+    ('JKK01', 'JKK'),
+    ('JKM01', 'JKM'),
+    ('JPN01', 'JPN'),
+)
+
+
 STATUS = (
     ('1', 'BELUM MENIKAH'),
     ('2', 'MENIKAH')
@@ -44,6 +52,15 @@ AKTIF_NA = (
     (False, 'Tidak Aktif'),
     (True, 'Aktif')
 )
+
+
+class SebabKlaim(models.Model):
+    kode = models.CharField(max_length=5)
+    keterangan = models.CharField(max_length=200)
+    keyword = models.CharField(max_length=3)
+
+    def __str__(self):
+        return '{} - {}'.format(self.kode, self.keterangan)
 
 
 class NoKPJ(models.Model):
@@ -98,6 +115,8 @@ class DataKlaim(models.Model):
     # tgl_na = models.DateField()
     email = models.EmailField(max_length=100)
     nama_rekening = models.CharField(max_length=100)
+    tipe_klaim = models.CharField(max_length=5, choices=TIPE_KLAIM)
+    sebab_klaim = models.ForeignKey(SebabKlaim, on_delete=models.CASCADE)
     no_rekening = models.CharField(
         max_length=16, validators=[NO_REK_VALIDATOR])
     file_kk = models.FileField(
@@ -118,10 +137,10 @@ class DataKlaim(models.Model):
         return self.data_tk.kpj.user_kpj.nama
 
 
-@receiver(post_save, sender=DataTK)
-def create_dataTk(sender, instance, created, **kwargs):
-    if created:
-        DataKlaim.objects.create(data_tk=instance)
+# @receiver(post_save, sender=DataTK)
+# def create_dataTk(sender, instance, created, **kwargs):
+#     if created:
+#         DataKlaim.objects.create(data_tk=instance)
 # class DaftarHRD(models.Model):
 #     user = models.ForeignKey(User, on_delete=models.CASCADE)
 #     nama = models.CharField(max_length=100)

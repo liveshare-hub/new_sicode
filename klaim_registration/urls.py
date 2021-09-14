@@ -1,3 +1,4 @@
+from collections import namedtuple
 from django.urls import path, re_path
 from django.conf import settings
 from django.conf.urls.static import static
@@ -17,6 +18,7 @@ urlpatterns = [
     path('pengkinian/tk/', views.ListDataTerkini, name='list-pengkinian'),
     path('pengkinian/tk/<int:pk>', views.PengkinianTK, name='pengkinian-tk'),
     path('hrd/klaim/', views.get_detail_tk, name='get-detail'),
+    path('klaim/tk/<int:pk>', views.PengajuanKlaim, name='pengajuan-klaim-tk'),
     path('daftar/kpj/json/', views.DataTKJson, name='tk-json'),
     path('hrd/klaim/<int:klaim_id>/',
          views.get_klaimhrd_json, name='klaim-detail'),

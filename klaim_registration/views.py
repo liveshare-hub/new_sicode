@@ -363,7 +363,7 @@ def DataTKJson(request):
 def PengkinianJson(request):
     user = request.user
     pengkinian_json = list(DataTK.objects.select_related('kpj').filter(
-        kpj__user_kpj__npp_id=user.profile.npp_id).values('kpj__no_kpj', 'kpj__user_kpj__nama', 'kpj__user_kpj__nik', 'alamat', 'nama_ibu', 'status',
+        kpj__user_kpj__npp_id=user.profile.npp_id).values('kpj__id', 'kpj__no_kpj', 'kpj__user_kpj__nama', 'kpj__user_kpj__nik', 'alamat', 'nama_ibu', 'status',
                                                           'nama_pasangan', 'tgl_lahir_pasangan', 'nama_anak_s', 'tgl_lahir_s', 'nama_anak_d', 'tgl_lahir_d'))
     for data in pengkinian_json:
         if data['status'] == '1':
@@ -371,6 +371,33 @@ def PengkinianJson(request):
         else:
             data['status'] = 'MENIKAH'
     return JsonResponse({'data': pengkinian_json})
+
+
+def PengajuanKlaim(request, pk):
+    qs = DataTK.objects.select_related(
+        'kpj').filter(kpj__id=pk).first()
+    # print(qs.id)
+    if request.method == 'POST':
+        form = DataKlaimForm(request.POST, request.FILES)
+
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.data_tk_id = qs.id
+            post.tipe_klaim = form.cleaned_data['tipe_klaim']
+            post.sebab_klaim = form.cleaned_data['sebab_klaim']
+            post.email = form.cleaned_data['email']
+            post.nama_rekening = form.cleaned_data['nama_rekening']
+            post.no_rekening = form.cleaned_data['no_rekening']
+            post.file_kk = form.cleaned_data['file_kk']
+            post.file_ktp = form.cleaned_data['file_ktp']
+            post.file_paklaring = form.cleaned_data['file_paklaring']
+            post.file_lain = form.cleaned_data['file_lain']
+            post.save()
+
+            return redirect(reverse('home'))
+    else:
+        form = DataKlaimForm(instance=qs)
+        return render(request, 'klaim_registration/daftar.html', {'form': form, 'qs': qs})
 
 
 @ login_required(login_url='/accounts/login/')

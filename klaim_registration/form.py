@@ -1,9 +1,10 @@
 from django import forms
+from django.db import models
 from django.forms import widgets
 from datetime import datetime
 # from dal import autocomplete
 
-from .models import DataKlaim, DataTK, NoKPJ
+from .models import DataKlaim, DataTK, NoKPJ, SebabKlaim
 
 
 STATUS = (
@@ -29,17 +30,20 @@ class DataKlaimForm(forms.ModelForm):
         })
     )
 
-    # tgl_na = forms.DateField(
-    #     initial=datetime.now(),
-    #     widget=forms.DateInput(attrs={
-    #         'class': 'form-control'
-    #     })
-    # )
+    sebab_klaim = forms.ModelChoiceField(
+        queryset=SebabKlaim.objects.all(),
+        widget=forms.Select(attrs={
+            'class': 'form-control'
+        })
+    )
 
     class Meta:
         model = DataKlaim
         exclude = ('data_tk',)
         widgets = {
+            'tipe_klaim': forms.Select(attrs={
+                'class': 'form-control'
+            }),
             'nama_rekening': forms.TextInput(attrs={
                 'class': 'form-control', 'placeholder': 'NAMA PEMILIK REKENING'
             }),
@@ -52,12 +56,9 @@ class DataKlaimForm(forms.ModelForm):
             'file_ktp': forms.FileInput(attrs={
                 'class': 'form-control'
             }),
-            'file_vaklaring': forms.FileInput(attrs={
+            'file_paklaring': forms.FileInput(attrs={
                 'class': 'form-control'
             }),
-            'email': forms.EmailInput(attrs={
-                'class': 'form-control', 'placeholder': 'Email'
-            })
         }
 
 
