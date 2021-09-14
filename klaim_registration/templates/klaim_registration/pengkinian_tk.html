@@ -68,6 +68,17 @@
             d.nama_anak_d = '-';
             d.tgl_lahir_d = '-'
         }
+        if (d.nama_anak_s === null){
+          d.nama_anak_s = '-';
+          d.tgl_lahir_s = '-';
+          d.nama_anak_d = '-';
+          d.tgl_lahir_d = '-'
+        }
+
+        if (d.nama_anak_d === null){
+            d.nama_anak_d = '-';
+          d.tgl_lahir_d = '-'
+        }
         
         return '<table cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">'+
             '<tr>'+
@@ -107,7 +118,7 @@
                 },
                 { "data": "kpj__no_kpj" },
                 { "data": "kpj__user_kpj__nama" },
-                { "data": "nik" },
+                { "data": "kpj__user_kpj__nik" },
                 { "data": "alamat" },
                 { "data": "nama_ibu"},
                 { "data": "status"}

@@ -212,17 +212,16 @@ def TambahTK(request):
 
 
 def PengkinianTK(request, pk):
-    qs = get_object_or_404(DataTK, kpj__user_kpj_id=pk)
-    # qs = DataTK.objects.select_related(
-    # 'kpj').filter(kpj__user_kpj_id=pk).first()
+    # qs = get_object_or_404(DataTK, kpj__user_kpj_id=pk)
+    qs = NoKPJ.objects.select_related(
+        'user_kpj').filter(user_kpj_id=pk).first()
 
     if request.method == 'POST':
         form = DataTKForm(request.POST)
 
         if form.is_valid():
             post = form.save(commit=False)
-            post.kpj_id = form.cleaned_data['kpj'].id
-            post.nik = form.cleaned_data['nik']
+            post.kpj_id = qs.id
             post.alamat = form.cleaned_data['alamat']
             post.nama_ibu = form.cleaned_data['nama_ibu']
             post.status = form.cleaned_data['status']
@@ -236,7 +235,7 @@ def PengkinianTK(request, pk):
             return redirect(reverse(('list-pengkinian')))
     else:
         form = DataTKForm(instance=qs)
-    return render(request, 'klaim_registration/daftar_tk.html', {'form': form})
+    return render(request, 'klaim_registration/daftar_tk.html', {'form': form, 'qs': qs})
 
 
 @ login_required(login_url='/accounts/login/')
@@ -364,7 +363,7 @@ def DataTKJson(request):
 def PengkinianJson(request):
     user = request.user
     pengkinian_json = list(DataTK.objects.select_related('kpj').filter(
-        kpj__user_kpj__npp_id=user.profile.npp_id).values('kpj__no_kpj', 'kpj__user_kpj__nama', 'nik', 'alamat', 'nama_ibu', 'status',
+        kpj__user_kpj__npp_id=user.profile.npp_id).values('kpj__no_kpj', 'kpj__user_kpj__nama', 'kpj__user_kpj__nik', 'alamat', 'nama_ibu', 'status',
                                                           'nama_pasangan', 'tgl_lahir_pasangan', 'nama_anak_s', 'tgl_lahir_s', 'nama_anak_d', 'tgl_lahir_d'))
     for data in pengkinian_json:
         if data['status'] == '1':

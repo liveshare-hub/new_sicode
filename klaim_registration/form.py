@@ -80,9 +80,6 @@ class DataTKForm(forms.ModelForm):
         # fields = '__all__'
         exclude = ('kpj',)
         widgets = {
-            'nik': forms.TextInput(attrs={
-                'class': 'form-control', 'placeholder': 'No KTP'
-            }),
             'alamat': forms.TextInput(attrs={
                 'class': 'form-control', 'placeholder': 'Alamat'
             }),

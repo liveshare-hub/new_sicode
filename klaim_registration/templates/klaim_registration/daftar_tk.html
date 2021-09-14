@@ -26,12 +26,7 @@
                                 <div class="card-body" id="card-1" style="background-color:#F8F5F1">
                                     <div class="row mb-2">
                                         <div class="col">
-                                            {{form.kpj}}
-                                            {{form.kpj.errors}}
-                                        </div>
-                                        <div class="col">
-                                            {{form.nik}}
-                                            {{form.nik.errors}}
+                                            <input class="form-control" id="disabledInput" type="text" name="kpj" placeholder="" value="{{qs}}" disabled>
                                         </div>
                                     </div>
                                     <div class="row mb-2">
@@ -126,9 +121,9 @@
 
 {% block javascripts %}
 <script>
-$(document).ready(function(){
-    $('.data-select').select2();
-})
+//$(document).ready(function(){
+  //  $('.data-select').select2();
+//})
 </script>
 
 <script>

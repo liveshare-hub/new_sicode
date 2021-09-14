@@ -64,8 +64,8 @@ class NoKPJ(models.Model):
 class DataTK(models.Model):
     kpj = models.ForeignKey(
         NoKPJ, on_delete=models.CASCADE)
-    nik = models.CharField(max_length=16, validators=[
-                           NIK_VALIDATOR])
+    # nik = models.CharField(max_length=16, validators=[
+    #                        NIK_VALIDATOR])
     # no_kpj = models.ForeignKey(NoKPJ, on_delete=models.CASCADE)
     alamat = models.CharField(max_length=250)
     nama_ibu = models.CharField(max_length=100)
@@ -86,10 +86,10 @@ class DataTK(models.Model):
         return '{} - {}'.format(self.kpj.no_kpj, self.kpj.user_kpj.nama)
 
 
-@receiver(post_save, sender=NoKPJ)
-def create_dataTk(sender, instance, created, **kwargs):
-    if created:
-        DataTK.objects.create(kpj=instance)
+# @receiver(post_save, sender=NoKPJ)
+# def create_dataTk(sender, instance, created, **kwargs):
+#     if created:
+#         DataTK.objects.create(kpj=instance)
 
 
 class DataKlaim(models.Model):
