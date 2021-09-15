@@ -29,7 +29,7 @@
               <div class="card-body">
               
   
-  <table id="example" class="table table-responsive table-bordered table-striped table-sm">
+  <table id="example" class="table table-sm display">
       <thead>
           <tr>
           <th scope="col">#</th>
@@ -56,14 +56,14 @@
       {% else %}
       <tr>
           <td>{{forloop.counter}}</td>
-          <td>{{data.nama}}</td>
-          <td>{{data.kpj}}</td>
-          <td>{{data.npp}}</td>
-          <td>{{data.tempat_lahir}}</br>{{data.tgl_lahir}}</td>
-          <td>{{data.nik}}</td>
-          <td>{{data.alamat}}</td>
-          <td>{{data.nama_ibu}}</td>
-          <td>{{data.get_status_display}}</td>
+          <td>{{data.data_tk.kpj.user_kpj.nama}}</td>
+          <td>{{data.data_tk.kpj.no_kpj}}</td>
+          <td>{{data.data_tk.kpj.user_kpj.npp.nama}}</td>
+          <td>{{data.data_tk.kpj.user_kpj.tempat_lahir}}</br>{{data.data_tk.kpj.user_kpj.tgl_lahir}}</td>
+          <td>{{data.data_tk.kpj.user_kpj.nik}}</td>
+          <td>{{data.data_tk.alamat}}</td>
+          <td>{{data.data_tk.nama_ibu}}</td>
+          <td>{{data.data_tk.get_status_display}}</td>
           <td>{{data.no_rekening}}</td>
           {% if data.file_kk %}
           <td><a href="{{ data.file_kk.url }}" class="badge bg-info text-dark" rel="noopener noreferrer">Download</a></td>
@@ -75,8 +75,8 @@
           {% else %}
           <td> - </t>
           {% endif %}
-          {% if data.file_buku_nikah %}
-          <td><a href="{{ data.file_buku_nikah.url }}" class="badge bg-info text-dark" rel="noopener noreferrer">Download</a></td>
+          {% if data.file_paklaring %}
+          <td><a href="{{ data.file_paklaring.url }}" class="badge bg-info text-dark" rel="noopener noreferrer">Download</a></td>
           {% else %}
           <td> - </td>
           {% endif %}
