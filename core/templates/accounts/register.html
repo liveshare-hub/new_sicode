@@ -25,7 +25,22 @@
             <form role="form" method="post" action="">
 
               {% csrf_token %} 
-
+              
+              <div class="input-group mb-3">
+                <div class="input-group-prepend"><span class="input-group-text">
+                    <svg class="c-icon">
+                      <use xlink:href="/static/assets/vendors/@coreui/icons/svg/free.svg#cil-magnifying-glass"></use>
+                    </svg></span></div>
+                    <input type="text" id="id_npp" class="form-control" placeholder="NPP">
+                    
+              </div>
+              <div class="input-group mb-3">  
+                <input type="text" id="id_hasil_npp" name="hasil_npp" class="form-control" disabled>
+                
+              </div>
+              <div class="input-group mb-3">
+              <input type="text" id="id_no_npp" name="no_npp" class="form-control" disabled>
+              </div>
               <div class="input-group mb-3">
                 <div class="input-group-prepend"><span class="input-group-text">
                     <svg class="c-icon">
@@ -80,4 +95,48 @@
 {% endblock content %}
 
 <!-- Specific Page JS goes HERE  -->
-{% block javascripts %}{% endblock javascripts %}
+{% block javascripts %}
+<script>
+
+var namaNpp = ``
+
+
+$(document).ready(function() {
+  $("div input#id_hasil_npp").hide();
+  
+  $("#id_npp").on("keyup", function(event){
+    $(this).val($(this).val().toUpperCase());
+    event.preventDefault();
+    $("div input#id_hasil_npp").show();
+    $("div input#id_no_npp").show();
+    var value = $(this).val().toUpperCase();
+    $.ajax({
+      type:'GET',
+      url:"{% url 'api-perusahaan' %}" + `?search=${value}`,
+      async: true,
+      success:function(data){
+        if(data.length > 0) {
+          $("#id_hasil_npp").attr("value",`${data[0]['nama']}`)
+          $("#id_no_npp").attr("value",`${data[0]['id']}`)
+          
+        }
+        else{
+          $("#id_hasil_npp").val("NPP Tidak Ditemukan!!!")
+        }
+      },
+      error: function(xhr, status, error){
+        var err = JSON.parse(xhr.responseText);
+        console.log(status)
+        alert(err)
+      }
+    });
+  
+});
+})
+
+
+</script>
+
+
+
+{% endblock javascripts %}

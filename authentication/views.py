@@ -2,6 +2,8 @@
 """
 Copyright (c) 2019 - present AppSeed.us
 """
+# from django_filters import filters
+from authentication.serializer import PerusahaanSerializer
 from django.contrib import messages
 # Create your views here.
 from django.shortcuts import render, redirect, get_object_or_404
@@ -10,10 +12,18 @@ from django.contrib.auth.models import Group, User
 from django.forms.utils import ErrorList
 from django.http import HttpResponse
 from django.contrib.auth.hashers import make_password
+from rest_framework.generics import ListCreateAPIView
+from rest_framework.utils import serializer_helpers
+from rest_framework.views import APIView
+from rest_framework import filters
+from rest_framework import permissions
+from django_filters.rest_framework import DjangoFilterBackend
 from .forms import LoginForm, SignUpForm, ProfileForm
 
 from klaim_registration.form import DataTK, NoKPJ
-from .models import Profile
+from .models import Profile, Perusahaan
+
+from .filter import PerusahaanFilter, PerusahaanList
 
 
 def login_view(request):
@@ -43,17 +53,31 @@ def register_user(request):
     msg = None
     success = False
 
+    companies = Perusahaan.objects.all()
+    myFilter = PerusahaanFilter(request.GET, queryset=companies)
+    qs = myFilter.qs
+
     if request.method == "POST":
+        
         form = SignUpForm(request.POST)
         if form.is_valid():
+            npp = request.POST.get("no_npp")
+            print(npp)
             form.save()
             username = form.cleaned_data.get("username")
             raw_password1 = form.cleaned_data.get("password1")
             raw_password2 = form.cleaned_data.get("password2")
+            # npp = request.POST.get("no_npp")
+            
+            
             if raw_password1 != raw_password2:
                 msg = 'Password tidak sama'
             else:
                 user = authenticate(username=username, password=raw_password1)
+                try:
+                    Profile.objects.update_or_create(user__username=user, defaults={'npp_id':npp, 'nama':'BELUM UPDATE'},)
+                except:
+                    return redirect("register")
 
                 msg = 'User created - please <a href="/login">login</a>.'
                 success = True
@@ -65,7 +89,7 @@ def register_user(request):
     else:
         form = SignUpForm()
 
-    return render(request, "accounts/register.html", {"form": form, "msg": msg, "success": success})
+    return render(request, "accounts/register.html", {"form": form, "msg": msg, "success": success, "qs":qs, "myFilter":myFilter})
 
 
 def DetilProfile(request):
@@ -115,22 +139,22 @@ def settingProfile(request, pk):
     return render(request, "authentication/update_form.html", {'form': form, 'qs': qs})
 
 
-# def registerHRD(request):
-#     if request.method == 'POST':
-#         form = DaftarHRDForm(request.POST)
-#         if form.is_valid():
-#             post = form.save(commit=False)
-#             username = post.npp.npp
-#             password = make_password('WELCOME1', salt=['username'])
-#             buat_user = User.objects.create(
-#                 username=username, password=password)
-#             post.user__username = buat_user.username
-#             print(buat_user.id)
-#             group = Group.objects.get(name='hrd')
-#             buat_user.groups.add(group)
-#             post.save()
-#             messages.SUCCESS(request, 'Akun '+username+' berhasil dibuat')
-#             return redirect('login')
-#     else:
-#         form = DaftarHRDForm()
-#     return render(request, "accounts/register.html", {'form': form})
+class ListPerusahaan(ListCreateAPIView):
+    serializer_class = PerusahaanSerializer
+    permission_classes = [permissions.AllowAny,]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    filterset_fields = ['npp',]
+    search_fields = ['npp',]
+
+    # def get(self, request, format=None):
+
+    #     companies = [comp.nama for comp in Perusahaan.objects.all()]
+    #     return Response(companies)
+
+    def get_queryset(self):
+        
+        qs = Perusahaan.objects.all()
+        if qs.exists():
+            return qs
+        else:
+            return qs.none

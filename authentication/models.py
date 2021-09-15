@@ -58,7 +58,7 @@ class Profile(models.Model):
     is_hrd = models.BooleanField(default=True, choices=YA_TIDAK)
 
     def __str__(self):
-        return self.user.username
+        return '{} - {}'.format(self.user.username, self.npp)
 
     def save(self, *args, **kwargs):
         width = 250
