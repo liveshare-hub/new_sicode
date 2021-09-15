@@ -55,15 +55,15 @@ class SignUpForm(UserCreationForm):
 
 
 class ProfileForm(forms.ModelForm):
-    npp = forms.ModelChoiceField(required=False, queryset=Perusahaan.objects.all(), widget=forms.Select(attrs={
-        'class': 'form-control'
-    }))
+    # npp = forms.ModelChoiceField(required=False, queryset=Perusahaan.objects.all(), widget=forms.Select(attrs={
+    #     'class': 'form-control'
+    # }))
 
     class Meta:
         model = Profile
         fields = ('propic', 'nama', 'tgl_lahir',
                   'tempat_lahir', 'nik', 'no_hp', 'is_hrd',)
-        exclude = ('user',)
+        exclude = ('user', 'npp',)
 
         widgets = {
             'propic': forms.FileInput(attrs={

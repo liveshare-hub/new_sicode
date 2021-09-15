@@ -3,6 +3,8 @@
 Copyright (c) 2019 - present AppSeed.us
 """
 # from django_filters import filters
+from django.http import response
+from django.http.response import JsonResponse
 from authentication.serializer import PerusahaanSerializer
 from django.contrib import messages
 # Create your views here.
@@ -48,48 +50,98 @@ def login_view(request):
     return render(request, "accounts/login.html", {"form": form, "msg": msg})
 
 
+# def register_user(request):
+
+#     msg = None
+#     success = False
+
+#     companies = Perusahaan.objects.all()
+#     myFilter = PerusahaanFilter(request.GET, queryset=companies)
+#     qs = myFilter.qs
+
+#     if request.method == "POST":
+
+#         form = SignUpForm(request.POST)
+#         if form.is_valid():
+
+#             form.save()
+#             username = form.cleaned_data.get("username")
+#             raw_password1 = form.cleaned_data.get("password1")
+#             raw_password2 = form.cleaned_data.get("password2")
+#             # npp = request.POST.get("no_npp")
+
+#             if raw_password1 != raw_password2:
+#                 msg = 'Password tidak sama'
+#             else:
+#                 user = authenticate(username=username, password=raw_password1)
+#                 try:
+#                     Profile.objects.update_or_create(user__username=user, defaults={
+#                                                      'npp_id': npp, 'nama': 'BELUM UPDATE'},)
+#                 except:
+#                     return redirect("register")
+
+#                 msg = 'User created - please <a href="/login">login</a>.'
+#                 success = True
+
+#                 return redirect("register")
+
+#         else:
+#             msg = 'Form is not valid'
+#     else:
+#         form = SignUpForm()
+
+#     return render(request, "accounts/register.html", {"form": form, "msg": msg, "success": success, "qs": qs, "myFilter": myFilter})
+
 def register_user(request):
 
+    return render(request, 'accounts/register.html')
+
+
+def register_user_ajax(request):
     msg = None
-    success = False
-
-    companies = Perusahaan.objects.all()
-    myFilter = PerusahaanFilter(request.GET, queryset=companies)
-    qs = myFilter.qs
-
-    if request.method == "POST":
-        
-        form = SignUpForm(request.POST)
-        if form.is_valid():
-            npp = request.POST.get("no_npp")
-            print(npp)
-            form.save()
-            username = form.cleaned_data.get("username")
-            raw_password1 = form.cleaned_data.get("password1")
-            raw_password2 = form.cleaned_data.get("password2")
-            # npp = request.POST.get("no_npp")
-            
-            
-            if raw_password1 != raw_password2:
-                msg = 'Password tidak sama'
-            else:
-                user = authenticate(username=username, password=raw_password1)
-                try:
-                    Profile.objects.update_or_create(user__username=user, defaults={'npp_id':npp, 'nama':'BELUM UPDATE'},)
-                except:
-                    return redirect("register")
-
-                msg = 'User created - please <a href="/login">login</a>.'
-                success = True
-
-                return redirect("register")
-
+    if request.is_ajax():
+        username = request.POST.get('username', None)
+        password1 = request.POST.get('password1', None)
+        password2 = request.POST.get('password2', None)
+        npp_id = request.POST.get('no_npp')
+        if (password1 != password2):
+            msg = 'Password tidak sama'
         else:
-            msg = 'Form is not valid'
-    else:
-        form = SignUpForm()
+            user = authenticate(username=username, password=password1)
+            try:
+                Profile.objects.update_or_create(
+                    user__username=username, defaults={'npp_id': npp_id})
+            except:
+                return redirect('register')
+            msg = 'User created - please <a href="/login">login'
+            response = {
+                'msg': msg
+            }
+            return JsonResponse(response)
 
-    return render(request, "accounts/register.html", {"form": form, "msg": msg, "success": success, "qs":qs, "myFilter":myFilter})
+
+def create_user(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        password1 = request.POST['password1']
+        password2 = request.POST['password2']
+        npp_id = request.POST['no_npp']
+
+        if password1 != password2:
+            msg = 'Password Tidak Sama!'
+        else:
+            password = make_password(password1, salt=['username'])
+            User.objects.create(username=username, password=password)
+            try:
+                Profile.objects.update_or_create(
+                    user__username=username, defaults={'npp_id': npp_id})
+            except:
+                pass
+            msg = 'User Created - Please <a href="/accounts/login">login</a>'
+            response = {
+                'msg': msg
+            }
+            return JsonResponse(response)
 
 
 def DetilProfile(request):
@@ -121,7 +173,7 @@ def settingProfile(request, pk):
         if form.is_valid():
 
             post = form.save(commit=False)
-            post.npp = form.cleaned_data['npp']
+            # post.npp = form.cleaned_data['npp']
             post.nama = form.cleaned_data['nama']
             post.tgl_lahir = form.cleaned_data['tgl_lahir']
             post.tempat_lahir = form.cleaned_data['tempat_lahir']
@@ -141,10 +193,10 @@ def settingProfile(request, pk):
 
 class ListPerusahaan(ListCreateAPIView):
     serializer_class = PerusahaanSerializer
-    permission_classes = [permissions.AllowAny,]
+    permission_classes = [permissions.AllowAny, ]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
-    filterset_fields = ['npp',]
-    search_fields = ['npp',]
+    filterset_fields = ['npp', ]
+    search_fields = ['npp', ]
 
     # def get(self, request, format=None):
 
@@ -152,7 +204,7 @@ class ListPerusahaan(ListCreateAPIView):
     #     return Response(companies)
 
     def get_queryset(self):
-        
+
         qs = Perusahaan.objects.all()
         if qs.exists():
             return qs
