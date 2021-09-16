@@ -70,7 +70,7 @@ def listKPJ(request):
             user_kpj__npp_id=request.user.profile.npp_id, is_aktif=False)
         datas_tk = DataTK.objects.select_related('kpj').filter(
             kpj__user_kpj__npp_id=request.user.profile.npp_id)
-
+        print(request.user.profile.npp_id)
         print(datas_aktif)
     context = {
         'datas': datas_aktif,
