@@ -106,10 +106,11 @@ def daftarKPJ(request):
             str_digits = string.digits
             username = m+(''.join(random.choice(str_digits)for i in range(6)))
             password = make_password('WELCOME1', salt=[username])
-            cek = Profile.objects.filter(nama=nama, nik=nik)
-            if cek.exists():
-                post.user_kpj_id = cek[0].id
-            else:
+            try:
+                cek = Profile.objects.filter(nama=nama, nik=nik)
+                if cek.exists():
+                    post.user_kpj_id = cek[0].id
+            except:
                 buat_user = User.objects.create(
                     username=username, password=password)
                 post.user_kpj_id = buat_user.id
