@@ -129,13 +129,16 @@ def daftarKPJ(request):
             buat_user = User.objects.create(
                 username=username, password=password_hash)
             Profile.objects.update_or_create(user__username=username, defaults={
-                'npp_id': npp, 'nik': nik, 'nama': nama})
-            profile = Profile.objects.select_related(
-                'user').filter(user__username=username).first()
-
-            NoKPJ.objects.create(
-                user_kpj_id=profile.id, no_kpj=no_kpj, blth_keps=blth_keps, blth_na=blth_na, is_aktif=is_aktif)
-
+                'npp_id': npp, 'nik': nik, 'nama': nama, 'is_hrd': False})
+            try:
+                profile = Profile.objects.select_related(
+                    'user').filter(user__username=username).first()
+                print(profile)
+                kpj = NoKPJ.objects.create(
+                    user_kpj_id=profile.id, no_kpj=no_kpj, blth_keps=blth_keps, blth_na=blth_na, is_aktif=is_aktif)
+                print(kpj)
+            except:
+                pass
             msg = 'KPJ berhasil di input'
             response = {
                 'msg': msg
