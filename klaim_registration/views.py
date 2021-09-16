@@ -70,8 +70,6 @@ def listKPJ(request):
             user_kpj__npp_id=request.user.profile.npp_id, is_aktif=False)
         datas_tk = DataTK.objects.select_related('kpj').filter(
             kpj__user_kpj__npp_id=request.user.profile.npp_id)
-        print(request.user.profile.npp_id)
-        print(datas_aktif)
     context = {
         'datas': datas_aktif,
         'datas_na': datas_na,
@@ -93,41 +91,87 @@ def ListDataTerkini(request):
     return render(request, 'klaim_registration/pengkinian_tk.html', context)
 
 
+def formDaftarKPJ(request):
+    npp_id = request.user.profile.npp_id
+
+    return render(request, 'klaim_registration/daftar_kpj.html', {'npp_id': npp_id})
+
+
 @login_required(login_url='/accounts/login/')
 @admin_only
 def daftarKPJ(request):
-
+    msg = None
+    # npp_id = request.user.profile.npp
+    # print(npp_id)
     if request.method == 'POST':
-        form = KPJForm(request.POST)
-        if form.is_valid():
-            post = form.save(commit=False)
-            nama = request.POST.get('nama')
-            nik = request.POST.get('nik')
+        no_kpj = request.POST['no_kpj']
+        nama = request.POST['nama']
+        nik = request.POST['nik']
+        npp = request.POST['npp']
+        blth_keps = request.POST['blth_keps']
+        blth_na = request.POST['blth_na']
+        is_aktif = request.POST['is_aktif']
+        if is_aktif == 1:
+            is_aktif = True
+        else:
+            is_aktif = False
+        cek = NoKPJ.objects.filter(no_kpj=no_kpj)
+        if cek.exists():
+            msg = 'No KPJ Sudah terdaftar'
+        else:
             x = list(nama)
             m = (x[0]+x[1]).upper()
             str_digits = string.digits
             username = m+(''.join(random.choice(str_digits)for i in range(6)))
-            password = make_password('WELCOME1', salt=[username])
-            try:
-                cek = Profile.objects.filter(nama=nama, nik=nik)
-                if cek.exists():
-                    post.user_kpj_id = cek[0].id
-            except:
-                buat_user = User.objects.create(
-                    username=username, password=password)
-                post.user_kpj_id = buat_user.id
-            # post.user_kpj.user_id = buat_user.id
-            post.user_kpj.npp_id = request.user.profile.npp_id
-            # print(post.user_kpj.npp_id)
-            post.user_kpj.nama = nama
-            post.user_kpj.is_hrd = False
-            post.save()
-            post.user_kpj.save()
+            # password = ''.join(random.choice(str_digits)for i in range(6))
+            password = "WELCOME1"
+            password_hash = make_password(password, salt=[username])
+            buat_user = User.objects.create(
+                username=username, password=password_hash)
+            Profile.objects.update_or_create(user__username=username, defaults={
+                'npp_id': npp, 'nik': nik, 'nama': nama})
+            profile = Profile.objects.select_related(
+                'user').filter(user__username=username).first()
 
-            return redirect(reverse('list-kpj'))
-    else:
-        form = KPJForm()
-    return render(request, 'klaim_registration/daftar_kpj.html', {'form': form})
+            NoKPJ.objects.create(
+                user_kpj_id=profile.id, no_kpj=no_kpj, blth_keps=blth_keps, blth_na=blth_na, is_aktif=is_aktif)
+
+            msg = 'KPJ berhasil di input'
+            response = {
+                'msg': msg
+            }
+            return JsonResponse(response)
+
+    #     form = KPJForm(request.POST)
+    #     if form.is_valid():
+    #         post = form.save(commit=False)
+    #         nama = request.POST.get('nama')
+    #         nik = request.POST.get('nik')
+            # x = list(nama)
+            # m = (x[0]+x[1]).upper()
+            # str_digits = string.digits
+            # username = m+(''.join(random.choice(str_digits)for i in range(6)))
+            # password = make_password('WELCOME1', salt=[username])
+            # buat_user = User.objects.create(
+            #     username=username, password=password)
+    #         print(buat_user.id)
+    #         cek = Profile.objects.filter(user_id=buat_user.id)
+    #         if cek.exists():
+    #             post.user_kpj_id = cek[0].id
+    #         else:
+
+    # post.user_kpj.user_id = buat_user.id
+    # post.user_kpj.npp__id = request.user.profile.npp_id
+    # print(post.user_kpj.npp_id)
+    # post.user_kpj.nama = nama
+    # post.user_kpj.is_hrd = False
+    # post.user_kpj.save()
+    # post.save()
+
+    #         return redirect(reverse('list-kpj'))
+    # else:
+    #     form = KPJForm()
+    # return render(request, 'klaim_registration/daftar_kpj.html')
 
 
 @login_required(login_url='/accounts/login/')

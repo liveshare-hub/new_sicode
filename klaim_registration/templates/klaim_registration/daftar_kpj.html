@@ -25,40 +25,53 @@ Input No KPJ
                             Pendaftaran Tenaga Kerja
                         </div>
                         <div class="card-body" style="background-color:#5AA897">
-                            <form method="post">
+                            <form method="post" id="id_form">
                                 {% csrf_token %}
                                 <div class="row mb-2">
                                     <div class="col">
-                                        {{form.no_kpj}}
-                                        {{form.no_kpj.errors}}
+                                        <input type="text" id="id_no_kpj" name="no_kpj" class="form-control" placeholder="INPUT NO KPJ">
                                     </div>
                                     <div class="col">
-                                        {{form.nama}}
-                                        {{form.errors.nama}}
+                                        <input type="text" id="id_nama" name="nama" class="form-control" placeholder="INPUT NAMA LENGKAP">
                                     </div>
                                 </div>
                                 <div class="row mb-2">
                                     <div class="col">
-                                        {{form.blth_keps}}
-                                        {{form.blth_keps.errors}}
+                                        <input type="date" id="id_blth_keps" name="blth_keps" class="form-control" placeholder="BLTH KEPS">
                                     </div>
                                     <div class="col">
-                                        {{form.is_aktif}}
-                                    </div>
+                                        <select class="form-control" id="id_is_aktif" name="is_aktif">
                                     
+                                            <option value="1">Aktif</option>
+                                            <option value="2">Tidak Aktif</option>
+                                        </select>
+                                    </div>
                                 </div>
                                 <div class="row mb-2">
                                     <div class="col">
-                                        {{form.blth_na}}
-                                        {{form.blth_na.errors}}
+                                        <input type="date" id="id_blth_na" name="blth_na" class="form-control" placeholder="BLTH NA">
                                     </div>
                                     <div class="col">
-                                        <input class="form-control" name="nik" type="text" placeholder="Input NIK" maxlength=16>
+                                        <input class="form-control" name="nik" type="text" id="id_nik" placeholder="Input NIK" maxlength="16">
                                         <b id="hasil"></b>
                                     </div>
                                 </div>
-                                <div class="dx-flex justify-content-end">
-                                    <button type="submit" class="btn btn-primary float-right" style="background-color:#45526C;outline:none;border-style:none">Submit</button>
+                                <div class="row mb-2">
+                                    <div class="col">
+                                    <div class="dx-flex justify-content-start">
+                                        <a href="{% url 'list-kpj' %}" class="btn btn-primary" id="id_back">Back</a>
+                                    </div>
+                                    </div>
+                                    <div class="col">
+                                    <div class="dx-flex justify-content-end">
+                                        <input type="submit" name="submit" class="btn btn-primary float-right" value="Submit" style="background-color:#45526C;outline:none;border-style:none">
+                                    </div>
+                                    </div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col">
+                                        <input type="text" name="npp" id="id_npp" value="{{npp_id}}" style="display:none" disabled>
+                                    </div>
                                 </div>
                             </form>
                         </div>
@@ -72,13 +85,7 @@ Input No KPJ
 {% endblock  %}
 
 {% block javascripts %}
-<script>
-    $('#add_more').click(function() {
-        var form_idx = $('#id_nokpj_set-TOTAL_FORMS').val();
-        $('#form_set').append($('#empty_form').html().replace(/__prefix__/g, form_idx));
-        $('#id_nokpj_set-TOTAL_FORMS').val(parseInt(form_idx) + 1);
-    });
-</script>
+
 <script>
     $(function(){
         $('input[name="blth_na"]').hide();
@@ -93,9 +100,11 @@ Input No KPJ
             var optionText = option.text();
             if(optionText === 'Aktif'){
                 $('input[name="blth_na"]').hide();
+                console.log(option.val())
             }
             else{
                 $('input[name="blth_na"]').show();
+                console.log(option.val())
             }
 			}
     
@@ -126,6 +135,38 @@ $(document).ready(function(){
     
     
 });
+
+</script>
+
+<script>
+$(document).ready(function() {
+    $("#id_back").hide();
+    $(document).on('submit','#id_form', function(e){
+        e.preventDefault();
+
+        $.ajax({
+            type:'POST',
+            url:"{% url 'daftar-kpj-ajax' %}",
+            data: {
+                no_kpj:$("#id_no_kpj").val(),
+                nama:$("#id_nama").val(),
+                blth_keps:$("#id_blth_keps").val(),
+                blth_na:$("#id_blth_na").val(),
+                is_aktif:$('select[name="is_aktif"]').val(),
+                nik:$("#id_nik").val(),
+                npp:$("#id_npp").val(),
+                csrfmiddlewaretoken: $("input[name=csrfmiddlewaretoken]").val(),
+                dataType: "json",
+            },
+            success:function(data){
+                alert(data.msg)
+            },
+            error:function(err){
+                console.log(err)
+            }
+        });
+    });
+})
 
 </script>
 {% endblock  %}
