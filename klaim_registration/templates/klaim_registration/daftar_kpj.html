@@ -160,6 +160,7 @@ $(document).ready(function() {
             },
             success:function(data){
                 alert(data.msg)
+                window.location.href="{% url 'list-kpj' %}"
             },
             error:function(err){
                 console.log(err)
