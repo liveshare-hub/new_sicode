@@ -265,7 +265,7 @@ def PengkinianTK(request, pk):
     # qs = get_object_or_404(DataTK, kpj__user_kpj_id=pk)
     qs = NoKPJ.objects.select_related(
         'user_kpj').filter(user_kpj_id=pk).first()
-    if qs.user_kpj.tempat_lahir == '':
+    if qs.user_kpj.tempat_lahir == '' or qs.user_kpj.tempat_lahir == None:
         messages.WARNING(request, "Update Profile terlebih dahulu!")
         return redirect(reverse('list-kpj'))
     elif request.method == 'POST':
