@@ -56,7 +56,7 @@
               <div class="dropdown-header bg-light py-2"><strong>Settings</strong></div><a class="dropdown-item" href="{% url 'profile' %}">
                 <svg class="c-icon mr-2">
                   <use xlink:href="/static/assets/vendors/@coreui/icons/svg/free.svg#cil-user"></use>
-                </svg> Profile</a><a class="dropdown-item" href="{% url 'update_profile' pk=request.user.id %}">
+                </svg> Profile</a><a class="dropdown-item" href="{% url 'update_profile' pk=request.user.profile.id %}">
                 <svg class="c-icon mr-2">
                   <use xlink:href="/static/assets/vendors/@coreui/icons/svg/free.svg#cil-settings"></use>
                 </svg> Settings</a><a class="dropdown-item" href="#">
