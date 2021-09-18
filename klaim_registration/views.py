@@ -267,7 +267,7 @@ def PengkinianTK(request, pk):
         'user_kpj').filter(user_kpj_id=pk).first()
     if qs.user_kpj.tempat_lahir == '' or qs.user_kpj.tempat_lahir == None:
         messages.WARNING(request, "Update Profile terlebih dahulu!")
-        return redirect(reverse('list-kpj'))
+        return redirect('list-kpj')
     elif request.method == 'POST':
         form = DataTKForm(request.POST)
 
