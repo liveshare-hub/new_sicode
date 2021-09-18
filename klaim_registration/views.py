@@ -268,21 +268,24 @@ def PengkinianTK(request, pk):
 
     if request.method == 'POST':
         form = DataTKForm(request.POST)
-
-        if form.is_valid():
-            post = form.save(commit=False)
-            post.kpj_id = qs.id
-            post.alamat = form.cleaned_data['alamat']
-            post.nama_ibu = form.cleaned_data['nama_ibu']
-            post.status = form.cleaned_data['status']
-            post.nama_pasangan = form.cleaned_data['nama_pasangan']
-            post.tgl_lahir_pasangan = form.cleaned_data['tgl_lahir_pasangan']
-            post.nama_anak_s = form.cleaned_data['nama_anak_s']
-            post.tgl_lahir_s = form.cleaned_data['tgl_lahir_s']
-            post.nama_anak_d = form.cleaned_data['nama_anak_d']
-            post.tgl_lahir_d = form.cleaned_data['tgl_lahir_d']
-            post.save()
-            return redirect(reverse(('list-pengkinian')))
+        if qs.user_kpj.tempat_lahir is None:
+            messages.WARNING(request, "Update Profile terlebih dahulu!")
+            return redirect(reverse('list-kpj'))
+        else:
+            if form.is_valid():
+                post = form.save(commit=False)
+                post.kpj_id = qs.id
+                post.alamat = form.cleaned_data['alamat']
+                post.nama_ibu = form.cleaned_data['nama_ibu']
+                post.status = form.cleaned_data['status']
+                post.nama_pasangan = form.cleaned_data['nama_pasangan']
+                post.tgl_lahir_pasangan = form.cleaned_data['tgl_lahir_pasangan']
+                post.nama_anak_s = form.cleaned_data['nama_anak_s']
+                post.tgl_lahir_s = form.cleaned_data['tgl_lahir_s']
+                post.nama_anak_d = form.cleaned_data['nama_anak_d']
+                post.tgl_lahir_d = form.cleaned_data['tgl_lahir_d']
+                post.save()
+                return redirect(reverse(('list-pengkinian')))
     else:
         form = DataTKForm(instance=qs)
     return render(request, 'klaim_registration/daftar_tk.html', {'form': form, 'qs': qs})
