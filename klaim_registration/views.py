@@ -265,13 +265,13 @@ def PengkinianTK(request, pk):
     # qs = get_object_or_404(DataTK, kpj__user_kpj_id=pk)
     qs = NoKPJ.objects.select_related(
         'user_kpj').filter(user_kpj_id=pk).first()
+    if qs.user_kpj.tempat_lahir is None:
+        messages.WARNING(request, "Update Profile terlebih dahulu!")
+        return redirect(reverse('list-kpj'))
+    else:
+        if request.method == 'POST':
+            form = DataTKForm(request.POST)
 
-    if request.method == 'POST':
-        form = DataTKForm(request.POST)
-        if qs.user_kpj.tempat_lahir is None:
-            messages.WARNING(request, "Update Profile terlebih dahulu!")
-            return redirect(reverse('list-kpj'))
-        else:
             if form.is_valid():
                 post = form.save(commit=False)
                 post.kpj_id = qs.id
@@ -286,9 +286,9 @@ def PengkinianTK(request, pk):
                 post.tgl_lahir_d = form.cleaned_data['tgl_lahir_d']
                 post.save()
                 return redirect(reverse(('list-pengkinian')))
-    else:
-        form = DataTKForm(instance=qs)
-    return render(request, 'klaim_registration/daftar_tk.html', {'form': form, 'qs': qs})
+        else:
+            form = DataTKForm(instance=qs)
+        return render(request, 'klaim_registration/daftar_tk.html', {'form': form, 'qs': qs})
 
 
 @ login_required(login_url='/accounts/login/')
