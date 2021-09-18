@@ -20,5 +20,5 @@ urlpatterns = [
     path('accounts/', include("authentication.urls")),
     path("", include("app.urls"))             # UI Kits Html files
 ]
-if settings.DEBUG:
+if not settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_URL)
