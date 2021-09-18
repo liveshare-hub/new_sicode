@@ -171,7 +171,7 @@ STATICFILES_DIRS = (
 STATIC_ROOT = '/home/sicm6455/python2/new_sicode/public/'
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = '/home/sicm6455/python2/new_sicode/public/media/'
+MEDIA_ROOT = '/home/sicm6455/python2/new_sicode/media/'
 # MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
